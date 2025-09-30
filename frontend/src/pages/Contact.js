@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle, Calendar } from "lucide-react";
 import { mockData } from "../data/mockData";
+import axios from "axios";
+
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +17,9 @@ const Contact = () => {
   });
   
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -23,11 +28,29 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setIsSubmitted(true);
-    setTimeout(() => setIsSubmitted(false), 3000);
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/contact", formData);
+    
+      setMessage(res.data.message || "Votre message a été envoyé ✅");
+      setError(false);
+      setIsSubmitted(true); 
+    } catch (error) {
+      if (error.response) {
+        setMessage(error.response.data.error || "Erreur de données ❌");
+        setError(true);
+      } else {
+        setMessage("Le serveur ne répond pas. Veuillez réessayer plus tard.");
+        setError(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+    
   };
 
   return (
@@ -43,6 +66,21 @@ const Contact = () => {
       </section>
 
       {/* Contact Form & Info */}
+      
+      {error == true ? (message && (
+        <div className="text-center mt-4 text-sm text-red-500">{message}</div>
+      )) : (message && (
+        <div className="text-center mt-4 text-sm text-green-500">{message}</div>
+      ))}
+
+      {isLoading ? (
+        <div className="flex justify-center items-center" style={{ height: "100vh" }}>
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <p className="mt-4 text-gray-600">Chargement...</p>
+          </div>
+        </div>
+      ) : (
       <section className="contact-section">
         <div className="container">
           <div className="contact-content">
@@ -279,6 +317,8 @@ const Contact = () => {
           </div>
         </div>
       </section>
+      )}
+
 
       {/* Map Section */}
       <section className="map-section">

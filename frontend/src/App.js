@@ -11,7 +11,13 @@ import Testimonials from "./pages/Testimonials";
 import Contact from "./pages/Contact";
 import Resources from "./pages/Resources";
 import Dashboard from "./dashboard/pages/dashboard";
-import AdminLogin from "./dashboard/component/signin";
+import ManageTestimonials from "./dashboard/pages/testimonials";
+import ManageSettings from "./dashboard/pages/settings";
+import ManageUsers from "./dashboard/pages/user";
+import LayoutDashboard from "./Layout/layout-dashboard";
+import AdminLogin from "./dashboard/components/signin";
+import ManageBeneficiaries from "./dashboard/pages/beneficiaries";
+import AppointementPage from "./dashboard/pages/appointement";
 
 function LayoutPublic({ children }) {
   return (
@@ -21,10 +27,6 @@ function LayoutPublic({ children }) {
       <Footer />
     </>
   );
-}
-
-function LayoutDashboard({ children }) {
-  return <main>{children}</main>;
 }
 
 function App() {
@@ -94,24 +96,79 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <LayoutDashboard>
-   
-                {isLoginned ? (
+              isLoginned ? (
+                <LayoutDashboard>
                   <Dashboard />
-                ) : (
-                  <AdminLogin loginned={() => setIsLoginned(true)} />
-                )}
-              </LayoutDashboard>
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/testimonials"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ManageTestimonials />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/users"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ManageUsers />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/appointement"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <AppointementPage />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/settings"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ManageSettings />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/beneficiares"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ManageBeneficiaries />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
             }
           />
 
           <Route
             path="/dashboard/admin-login"
-            element={
-              <LayoutDashboard>
-                <AdminLogin loginned={() => setIsLoginned(true)} />
-              </LayoutDashboard>
-            }
+            element={<AdminLogin loginned={() => setIsLoginned(true)} />}
           />
         </Routes>
       </BrowserRouter>
