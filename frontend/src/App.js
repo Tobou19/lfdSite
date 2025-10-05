@@ -18,6 +18,7 @@ import LayoutDashboard from "./Layout/layout-dashboard";
 import AdminLogin from "./dashboard/components/signin";
 import ManageBeneficiaries from "./dashboard/pages/beneficiaries";
 import AppointementPage from "./dashboard/pages/appointement";
+import ManageEntries from "./dashboard/pages/entries";
 
 function LayoutPublic({ children }) {
   return (
@@ -111,6 +112,18 @@ function App() {
               isLoginned ? (
                 <LayoutDashboard>
                   <ManageTestimonials />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/entries"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ManageEntries />
                 </LayoutDashboard>
               ) : (
                 <AdminLogin loginned={() => setIsLoginned(true)} />

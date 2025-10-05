@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { CalendarDays } from "lucide-react";
+import { ArrowUpDown, CalendarDays } from "lucide-react";
 
 export default function Sidebar({ onClose }) {
   const location = useLocation();
@@ -18,9 +18,10 @@ export default function Sidebar({ onClose }) {
     { id: 1, name: "Dashboard", icon: <RectangleStackIcon className="size-5" />, path: "/dashboard" },
     { id: 2, name: "Beneficiaries", icon: <UserIcon className="size-5" />, path: "/dashboard/beneficiares" },
     { id: 3, name: "Appointement", icon: <CalendarDays className="size-5" />, path: "/dashboard/appointement" },
-    { id: 4, name: "Testimonials", icon: <TrophyIcon className="size-5" />, path: "/dashboard/testimonials" },
-    { id: 5, name: "Users", icon: <UserGroupIcon className="size-5" />, path: "/dashboard/users" },
-    { id: 6, name: "Settings", icon: <WrenchIcon className="size-5" />, path: "/dashboard/settings" },
+    { id: 4, name: "Entries", icon: <ArrowUpDown className="size-5" />, path: "/dashboard/entries" },
+    { id: 5, name: "Testimonials", icon: <TrophyIcon className="size-5" />, path: "/dashboard/testimonials" },
+    { id: 6, name: "Users", icon: <UserGroupIcon className="size-5" />, path: "/dashboard/users" },
+    { id: 7, name: "Settings", icon: <WrenchIcon className="size-5" />, path: "/dashboard/settings" },
   ];
 
   return (

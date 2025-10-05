@@ -42,6 +42,16 @@ app.get("/users", (req, res) => {
   });
 });
 
+app.get("/api/appointment", (req, res)=>{
+  db.query("SELECT * FROM contact", (err,results)=>{
+    if(err){
+      console.error("Erreur MySQL :", err);
+      res.status(500).json({error: "Erreur serveur"});
+    }else{
+      res.status(200).json(results);
+    }
+  })
+});
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
   db.query(
@@ -59,6 +69,25 @@ app.post("/api/login", (req, res) => {
     }
   );
 });
+
+app.post("/api/contact", (req, res) => {
+  const { firstName, lastName, email, phone, subject, message, preferredDate, preferredTime } = req.body;
+
+  db.query(
+    "INSERT INTO contact (firstName, lastName, email, phone, subject, message, preferredDate, preferredTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    [firstName, lastName, email, phone, subject, message, preferredDate, preferredTime],
+    (err, results) => {
+      if (err) {
+        console.error("❌ Erreur MySQL :", err);
+        res.status(500).json({ error: "Erreur serveur" });
+      } else {
+        res.json({ message: "✅ Votre demande a ete envoye" });
+      }
+    }
+  );
+});
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
