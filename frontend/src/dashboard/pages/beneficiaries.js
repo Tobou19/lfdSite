@@ -1,15 +1,31 @@
+import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 
-/**
- * ManageBeneficiaries.jsx
- * Page complète de gestion des bénéficiaires (simulée, CRUD local)
- *
- * - Copier / coller dans ton projet React (Tailwind requis)
- * - Toutes les données sont locales (useState). Tu peux remplacer les actions
- *   par des appels API plus tard si besoin.
- */
-
 export default function ManageBeneficiaries() {
+  
+  // --- State ---
+  const [beneficiaries, setBeneficiaries] = useState([]);
+  // const [therapies, setTherapies] = useState(initialTherapies);
+  // const [appointments, setAppointments] = useState(initialAppointments);
+  // const [docs, setDocs] = useState(initialDocs);
+
+  // const [selected, setSelected] = useState(null); 
+  // const [query, setQuery] = useState("");
+  // const [therapyFilter, setTherapyFilter] = useState("");
+  // const [showAddModal, setShowAddModal] = useState(false);
+  // const [editing, setEditing] = useState(null); 
+  // const [form, setForm] = useState({ name: "", email: "", phone: "", birthdate: "", notes: "" });
+
+  
+useEffect(() => {
+  const fetchBeneficiaires = async () => {
+    const beneficiaires = await axios.get("http://localhost:5000/beneficiaires");
+    setBeneficiaries(beneficiaires.data);
+  }
+  fetchBeneficiaires();
+}, []);
+
+
   // --- Données initiales simulées ---
   const initialBeneficiaries = [
     { id: 1, name: "Alice Mbarga", email: "alice@example.com", phone: "670000111", birthdate: "1995-02-10", notes: "Patient présentant anxiété légère." },
@@ -31,18 +47,19 @@ export default function ManageBeneficiaries() {
 
   const initialDocs = { 1: [{ id: 1, name: "Bilan_initial.pdf", uploadedAt: "2025-09-01" }], 2: [], 3: [] };
 
-  // --- State ---
-  const [beneficiaries, setBeneficiaries] = useState(initialBeneficiaries);
-  const [therapies, setTherapies] = useState(initialTherapies);
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [docs, setDocs] = useState(initialDocs);
 
-  const [selected, setSelected] = useState(null); // beneficiary object
-  const [query, setQuery] = useState("");
-  const [therapyFilter, setTherapyFilter] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editing, setEditing] = useState(null); // beneficiary id editing
-  const [form, setForm] = useState({ name: "", email: "", phone: "", birthdate: "", notes: "" });
+    // --- State ---
+    // const [beneficiaries, setBeneficiaries] = useState([]);
+    const [therapies, setTherapies] = useState(initialTherapies);
+    const [appointments, setAppointments] = useState(initialAppointments);
+    const [docs, setDocs] = useState(initialDocs);
+  
+    const [selected, setSelected] = useState(null); 
+    const [query, setQuery] = useState("");
+    const [therapyFilter, setTherapyFilter] = useState("");
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [editing, setEditing] = useState(null); 
+    const [form, setForm] = useState({ name: "", email: "", phone: "", birthdate: "", notes: "" , idCarnet: ""});
 
   // quick appt toggle
   const [showQuickAppt, setShowQuickAppt] = useState(false);
@@ -85,23 +102,21 @@ export default function ManageBeneficiaries() {
     setShowAddModal(true);
   }
 
-  function handleSaveBeneficiary() {
+  async function handleSaveBeneficiary() {
     if (!form.name || !form.email) { alert("Le nom et l'email sont requis."); return; }
+  
     if (editing) {
-      setBeneficiaries((prev) => prev.map((b) => (b.id === editing ? { ...b, ...form } : b)));
-      setShowAddModal(false);
-      setEditing(null);
+      await axios.put(`http://localhost:5000/beneficiaires/${editing}`, form);
     } else {
-      const newid = nextId(beneficiaries);
-      const newB = { id: newid, ...form };
-      setBeneficiaries((prev) => [newB, ...prev]);
-      setTherapies((prev) => ({ ...prev, [newid]: [] }));
-      setAppointments((prev) => ({ ...prev, [newid]: [] }));
-      setDocs((prev) => ({ ...prev, [newid]: [] }));
-      setShowAddModal(false);
-      setSelected(newB);
+      await axios.post("http://localhost:5000/beneficiaires/add", form);
     }
+  
+    const res = await axios.get("http://localhost:5000/beneficiaires");
+    setBeneficiaries(res.data);
+    setShowAddModal(false);
+    setEditing(null);
   }
+  
 
   function startEdit(b) {
     setEditing(b.id);
@@ -109,14 +124,25 @@ export default function ManageBeneficiaries() {
     setShowAddModal(true);
   }
 
-  function handleDeleteBeneficiary(id) {
+  async function handleDeleteBeneficiary(id) {
     if (!window.confirm("Supprimer ce bénéficiaire ? Toutes ses données seront supprimées.")) return;
-    setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
-    setTherapies((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
-    setAppointments((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
-    setDocs((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
-    if (selected?.id === id) setSelected(null);
+  
+    try {
+      await axios.delete(`http://localhost:5000/beneficiaires/${id}`);
+  
+      // seulement après confirmation côté serveur, mettre à jour le state
+      setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
+      setTherapies((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
+      setAppointments((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
+      setDocs((prev) => { const cp = { ...prev }; delete cp[id]; return cp; });
+      if (selected?.id === id) setSelected(null);
+  
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Impossible de supprimer ce bénéficiaire. Vérifiez que l'ID existe.");
+    }
   }
+  
 
   // --- Therapy management ---
   function addTherapy(name) {
@@ -133,10 +159,11 @@ export default function ManageBeneficiaries() {
   // --- Appointments management ---
   const [apptForm, setApptForm] = useState({ date: "", time: "", notes: "" });
 
-  function addAppointment(payload) {
+  const  addAppointment = async (payload) => {
     if (!selected) return;
     const id = nextChildId(appointments);
     setAppointments((prev) => ({ ...prev, [selected.id]: [...(prev[selected.id] || []), { id, ...payload }] }));
+    axios.post(`http://localhost:5000/beneficiaires/appointment/${6}`, payload);
   }
 
   function removeAppointment(id) {
@@ -239,7 +266,7 @@ ${(appointments[selected.id] || []).map(a => `${a.date} ${a.time} - ${a.notes}`)
             </div>
             <ul className="space-y-2">
               {filteredList.length === 0 ? (
-                <li><div className="text-sm text-gray-500 p-3">Aucun bénéficiaire trouvé.</div></li>
+                <div className="text-sm text-gray-500 p-3">Aucun bénéficiaire trouvé.</div>
               ) : (
                 filteredList.map((b) => (
                   <li
@@ -443,6 +470,7 @@ ${(appointments[selected.id] || []).map(a => `${a.date} ${a.time} - ${a.notes}`)
                 <input className="p-2 border rounded" placeholder="Téléphone" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
                 <input className="p-2 border rounded" type="date" value={form.birthdate} onChange={(e) => setForm((f) => ({ ...f, birthdate: e.target.value }))} />
                 <textarea className="col-span-2 p-2 border rounded" placeholder="Notes / historique" value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
+                <input type="number" className="p-2 border rounded" placeholder="Carnet" value={form.idCarnet} onChange={(e) => setForm((f) => ({ ...f, idCarnet: e.target.value }))} />
               </div>
 
               <div className="mt-4 flex justify-end gap-2">
