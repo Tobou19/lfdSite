@@ -17,11 +17,12 @@ export default function Sidebar({ onClose }) {
   const itemData = [
     { id: 1, name: "Dashboard", icon: <RectangleStackIcon className="size-5" />, path: "/dashboard" },
     { id: 2, name: "Beneficiaries", icon: <UserIcon className="size-5" />, path: "/dashboard/beneficiares" },
-    { id: 3, name: "Appointement", icon: <CalendarDays className="size-5" />, path: "/dashboard/appointement" },
-    { id: 4, name: "Entries", icon: <ArrowUpDown className="size-5" />, path: "/dashboard/entries" },
-    { id: 5, name: "Testimonials", icon: <TrophyIcon className="size-5" />, path: "/dashboard/testimonials" },
-    { id: 6, name: "Users", icon: <UserGroupIcon className="size-5" />, path: "/dashboard/users" },
-    { id: 7, name: "Settings", icon: <WrenchIcon className="size-5" />, path: "/dashboard/settings" },
+    { id: 3, name: "Services", icon: <UserIcon className="size-5" />, path: "/dashboard/services" },
+    { id: 4, name: "Appointement", icon: <CalendarDays className="size-5" />, path: "/dashboard/appointement" },
+    { id: 5, name: "Entries", icon: <ArrowUpDown className="size-5" />, path: "/dashboard/entries" },
+    { id: 6, name: "Testimonials", icon: <TrophyIcon className="size-5" />, path: "/dashboard/testimonials" },
+    { id: 7, name: "Users", icon: <UserGroupIcon className="size-5" />, path: "/dashboard/users" },
+    { id: 8, name: "Settings", icon: <WrenchIcon className="size-5" />, path: "/dashboard/settings" },
   ];
 
   return (

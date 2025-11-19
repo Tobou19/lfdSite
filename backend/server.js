@@ -7,12 +7,15 @@ const cors = require("cors");
 const mysql = require("mysql2");
 const app = express();
 const db = require("./config/db.config.js");
-
+const jwt = require("jsonwebtoken");
 const beneficiaresRouter = require("./routes/beneficiares.routes.js");
+const carnetRouter = require("./routes/carnet.routes.js");
 
 
 app.use(cors());
 app.use(express.json());
+
+const auth = require("./middlewares/auth");
 
 app.get("/", (req, res) => {
   res.send("Backend Express.js + MySQL prêt ✅");
@@ -39,19 +42,43 @@ app.get("/api/appointment", (req, res) => {
     }
   });
 });
+
+
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
+
   db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
     if (err) {
       console.error("Erreur MySQL :", err);
-      res.status(500).json({ error: "Erreur serveur" });
-    } else if (results.length > 0) {
-      res.json({ message: "Authentification réussie", user: results[0] });
-    } else {
-      res.status(401).json({ error: "Identifiants invalides" });
+      return res.status(500).json({ error: "Erreur serveur" });
     }
+
+    if (results.length === 0) {
+      return res.status(401).json({ error: "Identifiants invalides" });
+    }
+
+    const user = results[0];
+
+    // ❗ Vérification SANS cryptage pour le moment
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Identifiants invalides" });
+    }
+
+    // 🔥 Génération d’un token valide 7 jours
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET || "jkAZ9sJH8aSD7as8d7asd8A7D8A7d8ASD7as8d7A8SD7A8s7d8AS87D",
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "Authentification réussie",
+      token,
+      user: { id: user.id, email: user.email },
+    });
   });
 });
+
 
 app.post("/api/contact", (req, res) => {
   const {
@@ -89,6 +116,7 @@ app.post("/api/contact", (req, res) => {
 });
 
 app.use("/beneficiaires",beneficiaresRouter);
+app.use("/carnet",carnetRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

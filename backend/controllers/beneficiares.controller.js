@@ -28,26 +28,47 @@ const getBeneficiaresById = (req, res) => {
   });
 };
 
-// 🟢 Créer un bénéficiaire
+// 🟢 Créer un bénéficiaire et son carnet automatiquement
 const createBeneficiares = (req, res) => {
-  const { name, email, phone, birthdate, notes, idCarnet } = req.body;
+  const { name, email, phone, birthdate, notes } = req.body;
 
   if (!name || !email) {
     return res.status(400).json({ error: "Le nom et l'email sont requis" });
   }
 
+  // 1️⃣ Ajouter le bénéficiaire
   db.query(
-    "INSERT INTO beneficiaires (name, email, phone, birthdate, notes, idCarnet) VALUES (?, ?, ?, ?, ?, ?)",
-    [name, email, phone, birthdate, notes, idCarnet],
+    "INSERT INTO beneficiaires (name, email, phone, birthdate, notes) VALUES (?, ?, ?, ?, ?)",
+    [name, email, phone, birthdate, notes],
     (err, results) => {
       if (err) {
         console.error("❌ Erreur MySQL :", err);
-        return res.status(500).json({ error: "Erreur lors de l'ajout" });
+        return res.status(500).json({ error: "Erreur lors de l'ajout du bénéficiaire" });
       }
-      res.status(201).json({ message: "✅ Bénéficiaire ajouté avec succès", id: results.insertId });
+
+      const beneficiaireId = results.insertId;
+
+      // 2️⃣ Créer un carnet vide pour ce bénéficiaire
+      db.query(
+        "INSERT INTO carnet (beneficiaireId) VALUES (?)",
+        [beneficiaireId],
+        (err2, results2) => {
+          if (err2) {
+            console.error("❌ Erreur MySQL :", err2);
+            return res.status(500).json({ error: "Bénéficiaire créé mais erreur création carnet" });
+          }
+
+          res.status(201).json({
+            message: "✅ Bénéficiaire et carnet créés avec succès",
+            id: beneficiaireId,
+            carnetId: results2.insertId,
+          });
+        }
+      );
     }
   );
 };
+
 
 // 🟢 Mettre à jour un bénéficiaire
 const updateBeneficiares = (req, res) => {

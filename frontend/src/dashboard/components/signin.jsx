@@ -22,6 +22,9 @@ export default function AdminLogin({loginned}) {
         password,
       });
 
+      // 👉 Stocker le token
+localStorage.setItem("token", res.data.token);
+
       setMessage(res.data.message || "Connexion réussie ✅");
       setError(false);
       loginned();

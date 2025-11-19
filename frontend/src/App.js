@@ -19,6 +19,8 @@ import AdminLogin from "./dashboard/components/signin";
 import ManageBeneficiaries from "./dashboard/pages/beneficiaries";
 import AppointementPage from "./dashboard/pages/appointement";
 import ManageEntries from "./dashboard/pages/entries";
+import Carnet from "./components/carnet/carnet";
+import ServicesPage from "./dashboard/pages/services";
 
 function LayoutPublic({ children }) {
   return (
@@ -31,7 +33,9 @@ function LayoutPublic({ children }) {
 }
 
 function App() {
-  const [isLoginned, setIsLoginned] = useState(false);
+  const [isLoginned, setIsLoginned] = useState(() => {
+    return localStorage.getItem("token") ? true : false;
+  });
 
   return (
     <div className="App">
@@ -131,6 +135,19 @@ function App() {
             }
           />
           <Route
+            path="/dashboard/carnet/:id"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <Carnet />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+
+          <Route
             path="/dashboard/users"
             element={
               isLoginned ? (
@@ -148,6 +165,18 @@ function App() {
               isLoginned ? (
                 <LayoutDashboard>
                   <AppointementPage />
+                </LayoutDashboard>
+              ) : (
+                <AdminLogin loginned={() => setIsLoginned(true)} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard/services"
+            element={
+              isLoginned ? (
+                <LayoutDashboard>
+                  <ServicesPage />
                 </LayoutDashboard>
               ) : (
                 <AdminLogin loginned={() => setIsLoginned(true)} />
