@@ -1,8 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Users, Target, Heart, BookOpen } from "lucide-react";
 import { mockData } from "../data/mockData";
 
 const About = () => {
+  const [team, setTeam] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/team")
+      .then((res) => res.json())
+      .then((data) => {
+        setTeam(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erreur récupération équipe :", err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="about-page">
       {/* Hero Section */}
@@ -132,7 +148,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Preview */}
+      {/* Team Preview connecté */}
       <section className="team-preview">
         <div className="container">
           <div className="section-header">
@@ -142,24 +158,31 @@ const About = () => {
             </p>
           </div>
           
-          <div className="team-grid">
-            {mockData.team.slice(0, 3).map((member) => (
-              <div key={member.id} className="network-card team-card">
-                <div className="team-avatar">
-                  <div className="avatar-placeholder">
-                    {member.name.split(' ').map(n => n[0]).join('')}
+          {loading ? (
+            <p>Chargement de l’équipe...</p>
+          ) : (
+            <div className="team-grid">
+              {team.map((member) => (
+                <div key={member.id} className="network-card team-card">
+                  <div className="team-avatar">
+                    <div className="avatar-placeholder">
+                      {member.fullName
+                        .split(' ')
+                        .map(n => n[0])
+                        .join('')}
+                    </div>
+                  </div>
+                  <div className="team-info">
+                    <h3 className="heading-3">{member.fullName}</h3>
+                    <div className="team-role body-medium">{member.profession}</div>
+                    <div className="team-speciality body-small">{member.speciality}</div>
+                    <div className="team-experience body-small">{member.experience}</div>
+                    <p className="body-small team-description">{member.description}</p>
                   </div>
                 </div>
-                <div className="team-info">
-                  <h3 className="heading-3">{member.name}</h3>
-                  <div className="team-role body-medium">{member.role}</div>
-                  <div className="team-speciality body-small">{member.speciality}</div>
-                  <div className="team-experience body-small">{member.experience}</div>
-                  <p className="body-small team-description">{member.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -429,6 +452,80 @@ const About = () => {
           }
         }
       `}</style>
+
+
+      {/* Protocole Authentifié – Version Ergonomique avec Thèmes */}
+<section className="bg-gray-50 py-20">
+  <div className="container mx-auto px-4">
+    {/* Header */}
+    <div className="text-center mb-16">
+      <h2 className=" heading-1 text-3xl md:text-4xl font-bold mb-4">
+        Protocole Authentifié 
+      </h2>
+      <h2 className=" heading-1 text-3xl md:text-4xl font-bold mb-4">
+        pour la Réversion des Pathologies
+      </h2>
+      <p className="body-large text-gray-700 max-w-2xl mx-auto">
+        Ce protocole présente l’ensemble des étapes, règles et obligations nécessaires pour bénéficier des Services LFD dans le cadre de la réversion de maladies chroniques et d’autres affections.
+      </p>
+    </div>
+
+    {/* Cartes des étapes avec badges de thème */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[
+        { text: "Chaque bénéficiaire doit présenter un test RLT authentique afin de valider médicalement l’état de la maladie.", theme: "Validation" },
+        { text: "Le bénéficiaire doit fournir une preuve vidéo en direct, montrant l’état réel de la pathologie avant la transformation.", theme: "Preuve" },
+        { text: "Le paiement intégral doit être effectué afin de poursuivre la procédure.", theme: "Finance" },
+        { text: "Suivi strict du programme, respect exact des doses, adhérence complète aux instructions.", theme: "Conformité" },
+        { text: "Tous les tests de contrôle demandés doivent être fournis à temps pour permettre la validation du progrès réel.", theme: "Suivi" },
+        { text: "Le bénéficiaire doit éviter toute personne ou structure externe non reconnue.", theme: "Sécurité" },
+        { text: "Les services sont rendus sans favoritisme.", theme: "Éthique" },
+        { text: "Ces éléments servent à authentifier la véracité de la réversion.", theme: "Authentification" },
+        { text: "Le départ vers l’étranger n’est pas autorisé tant que les indicateurs biologiques ne sont pas suffisants.", theme: "Restrictions" },
+        { text: "Respect strict obligatoire pour garantir la synchronisation énergétique optimale (RSB-S1).", theme: "Dosage" },
+        { text: "Aucun défaut d’observance n’est toléré.", theme: "Discipline" },
+        { text: "Le bénéficiaire doit s’assurer que son engagement est ferme.", theme: "Engagement" },
+        { text: "L’équipe OHM fournit un accompagnement complet : suivi, éducation, conseils nutritionnels, gestion des risques énergétiques.", theme: "Soutien" },
+        { text: "Tous les produits et thérapies proposés sont strictement naturels.", theme: "Naturel" },
+        { text: "Indispensable pour la réussite du processus.", theme: "Conformité" },
+      ].map((item, index) => (
+        <div
+          key={index}
+          className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-lg">
+                {index + 1}
+              </div>
+              <h3 className="ml-4 font-semibold text-gray-800 text-lg">
+                Étape {index + 1}
+              </h3>
+            </div>
+            {/* Badge thème */}
+            <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
+              {item.theme}
+            </span>
+          </div>
+          <p className="text-gray-600">{item.text}</p>
+        </div>
+      ))}
+    </div>
+
+    {/* Disclaimer */}
+    <p className="mt-16 text-gray-500 italic text-center max-w-2xl mx-auto">
+      <strong>Disclaimer :</strong> Ce protocole ne doit être manipulé ou interprété que dans le cadre des services certifiés LFD/OHM. Toute reproduction non autorisée, mauvaise interprétation ou tentative d’altération engage la responsabilité du bénéficiaire.
+    </p>
+
+    {/* Signature */}
+    <p className="mt-6 font-semibold text-center">
+      <strong>Fidèlement vôtre,</strong>
+      <br />
+      (RTP)-Potentiel (OHM) Bénéficiaire
+    </p>
+  </div>
+</section>
+
     </div>
   );
 };

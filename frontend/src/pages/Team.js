@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { GraduationCap, Award, Calendar, MapPin } from "lucide-react";
-import { mockData } from "../data/mockData";
+import axios from "axios";
 
 const Team = () => {
+  const [team, setTeam] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 🔵 Charger les membres depuis ton backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/team") // adapte l'URL si besoin
+      .then((res) => {
+        setTeam(res.data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container">
+        <p>Chargement de l’équipe...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="team-page">
       {/* Hero Section */}
@@ -19,70 +41,96 @@ const Team = () => {
       <section className="team-section">
         <div className="container">
           <div className="team-grid">
-            {mockData.team.map((member) => (
+            {team.map((member) => (
               <div key={member.id} className="team-card-detailed">
+                
+                {/* TITRE + AVATAR */}
                 <div className="team-card-header">
                   <div className="team-avatar-large">
                     <div className="avatar-placeholder-large">
-                      {member.name.split(' ').map(n => n[0]).join('')}
+                      {member.fullName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </div>
+
                     <div className="availability-indicator">
-                      <span className="status-dot available"></span>
-                      <span className="status-text">Disponible</span>
+                      <span
+                        className={
+                          member.availability === "Disponible"
+                            ? "status-dot available"
+                            : "status-dot busy"
+                        }
+                      ></span>
+                      <span className="status-text">
+                        {member.availability || "Indisponible"}
+                      </span>
                     </div>
                   </div>
-                  
+
                   <div className="team-header-info">
-                    <h3 className="heading-2">{member.name}</h3>
-                    <div className="team-role-badge">{member.role}</div>
-                    <div className="team-speciality">
-                      <Award size={16} />
-                      <span>{member.speciality}</span>
-                    </div>
-                    <div className="team-experience">
-                      <Calendar size={16} />
-                      <span>{member.experience}</span>
-                    </div>
+                    <h3 className="heading-2">{member.fullName}</h3>
+
+                    <div className="team-role-badge">{member.profession}</div>
+
+                    {member.speciality && (
+                      <div className="team-speciality">
+                        <Award size={16} />
+                        <span>{member.speciality}</span>
+                      </div>
+                    )}
+
+                    {member.experience && (
+                      <div className="team-experience">
+                        <Calendar size={16} />
+                        <span>{member.experience}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                
+
+                {/* DESCRIPTION */}
                 <div className="team-card-body">
                   <p className="body-medium team-bio">{member.description}</p>
-                  
+
+                  {/* DOMAINS (expertise) */}
                   <div className="team-expertise">
                     <h4 className="heading-3">Domaines d'expertise</h4>
                     <div className="expertise-tags">
-                      <span className="expertise-tag">Nutrition thérapeutique</span>
-                      <span className="expertise-tag">Alimentation vivante</span>
-                      <span className="expertise-tag">Maladies chroniques</span>
+                      {member.domains?.map((d, index) => (
+                        <span key={index} className="expertise-tag">
+                          {d}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  
+
+                  {/* CERTIFICATIONS */}
                   <div className="team-qualifications">
                     <h4 className="heading-3">Formations & Certifications</h4>
-                    <div className="qualification-item">
-                      <GraduationCap size={16} />
-                      <span>Doctorat en Médecine Nutritionnelle</span>
-                    </div>
-                    <div className="qualification-item">
-                      <GraduationCap size={16} />
-                      <span>Certification en Alimentation Vivante</span>
-                    </div>
-                    <div className="qualification-item">
-                      <GraduationCap size={16} />
-                      <span>Formation en Micronutrition</span>
-                    </div>
+
+                    {member.certifications?.map((c, index) => (
+                      <div key={index} className="qualification-item">
+                        <GraduationCap size={16} />
+                        <span>{c}</span>
+                      </div>
+                    ))}
                   </div>
-                  
+
+                  {/* CONTACT */}
                   <div className="team-contact">
                     <button className="btn-primary team-cta">
                       Prendre rendez-vous
                     </button>
+
                     <div className="consultation-info">
                       <MapPin size={14} />
-                      <span className="body-small">Consultations sur site et en ligne</span>
+                      <span className="body-small">
+                        Consultations sur site et en ligne
+                      </span>
                     </div>
                   </div>
+
                 </div>
               </div>
             ))}

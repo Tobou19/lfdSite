@@ -4,6 +4,7 @@ import NavbarDashboard from "./Navbar/navbar";
 
 export default function LayoutDashboard({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -18,7 +19,7 @@ export default function LayoutDashboard({ children }) {
 
       {/* Content */}
       <div className="flex flex-col flex-1 w-full">
-        <NavbarDashboard onMenuClick={() => setSidebarOpen(true)} />
+        <NavbarDashboard onMenuClick={() => setSidebarOpen(true)} user={user} />
         <main className="flex-1 overflow-y-auto p-4">{children}</main>
       </div>
     </div>

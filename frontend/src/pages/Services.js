@@ -1,14 +1,81 @@
-import React from "react";
-import { ClipboardList, Droplets, Leaf, UserCheck, Clock, Euro, CheckCircle } from "lucide-react";
-import { mockData } from "../data/mockData";
+import React, { useEffect, useState } from "react";
+import {
+  ClipboardList,
+  Droplets,
+  Leaf,
+  UserCheck,
+  Clock,
+  Euro,
+  CheckCircle,
+} from "lucide-react";
+import axios from "axios";
 
 const Services = () => {
-  const serviceIcons = {
-    'clipboard-list': ClipboardList,
-    'droplets': Droplets,
-    'leaf': Leaf,
-    'user-check': UserCheck
+  const [services, setServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (service) => {
+    setSelectedService(service);
+    setClientName("");
+    setEmail("");
+    setPhone("");
+    setDate("");
+    setType(service.type || "Standard");
+    setIsModalOpen(true);
   };
+
+  const closeModal = () => {
+    setSelectedService(null);
+    setIsModalOpen(false);
+  };
+
+  const [clientName, setClientName] = useState("");
+  const [serviceTitle, setServiceTitle] = useState("");
+  const [date, setDate] = useState("");
+  const [status, setStatus] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [type, setType] = useState("");
+
+  const reservationSubmit = (e) => {
+    e.preventDefault();
+    const reservation = {
+      clientName,
+      email,
+      phone,
+      date,
+      serviceTitle: selectedService.title,
+      type,
+    };
+
+    axios
+      .post("http://localhost:5000/reservations/create", reservation)
+      .then((res) => {
+        alert("Réservation envoyée avec succès !");
+        closeModal();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Erreur lors de l'envoi de la réservation");
+      });
+  };
+
+  const serviceIcons = {
+    "clipboard-list": ClipboardList,
+    droplets: Droplets,
+    leaf: Leaf,
+    "user-check": UserCheck,
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:5000/services")
+      .then((res) => res.json())
+      .then((data) => {
+        setServices(data);
+      })
+      .catch((err) => console.error("Erreur fetch services:", err));
+  }, []);
 
   return (
     <div className="services-page">
@@ -17,7 +84,8 @@ const Services = () => {
         <div className="container">
           <h1 className="display-medium">Nos Services Thérapeutiques</h1>
           <p className="body-large">
-            Une approche personnalisée pour traiter vos maladies chroniques naturellement
+            Une approche personnalisée pour traiter vos maladies chroniques
+            naturellement
           </p>
         </div>
       </section>
@@ -26,7 +94,7 @@ const Services = () => {
       <section className="services-section">
         <div className="container">
           <div className="services-grid">
-            {mockData.services.map((service) => {
+            {services.map((service) => {
               const IconComponent = serviceIcons[service.icon] || ClipboardList;
               return (
                 <div key={service.id} className="service-card-detailed">
@@ -36,7 +104,6 @@ const Services = () => {
                     </div>
                     <div className="service-meta">
                       <div className="service-price">
-                        <Euro size={16} />
                         <span>{service.price}</span>
                       </div>
                       <div className="service-duration">
@@ -45,38 +112,255 @@ const Services = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <h3 className="heading-2">{service.title}</h3>
-                  <p className="body-large service-description">{service.description}</p>
-                  
+                  <p className="body-large service-description">
+                    {service.desc}
+                  </p>
+
                   <div className="service-details">
                     <h4 className="heading-3">Ce qui est inclus :</h4>
                     <ul className="service-inclusions">
-                      <li>
-                        <CheckCircle size={16} />
-                        <span>Bilan complet personnalisé</span>
-                      </li>
-                      <li>
-                        <CheckCircle size={16} />
-                        <span>Plan d'action sur mesure</span>
-                      </li>
-                      <li>
-                        <CheckCircle size={16} />
-                        <span>Suivi et ajustements</span>
-                      </li>
-                      <li>
-                        <CheckCircle size={16} />
-                        <span>Documentation complète</span>
-                      </li>
+                      {service.includes.map((inc, idx) => (
+                        <li key={idx}>
+                          <CheckCircle size={16} />
+                          <span>{inc}</span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
-                  
-                  <button className="btn-primary service-cta">
+
+                  <button
+                    onClick={() => openModal(service)}
+                    className="btn-primary service-cta"
+                  >
                     Réserver ce service
                   </button>
                 </div>
               );
             })}
+            {/* Modal Styles */}
+            <style jsx>{`
+              .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+              }
+
+              .modal-content {
+                background: white;
+                padding: 2rem;
+                border-radius: 16px;
+                width: 90%;
+                max-width: 500px;
+                position: relative;
+              }
+
+              .modal-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                font-size: 1.5rem;
+                background: none;
+                border: none;
+                cursor: pointer;
+              }
+
+              .modal-form label {
+                display: block;
+                margin-bottom: 1rem;
+              }
+
+              .modal-form input {
+                width: 100%;
+                padding: 0.5rem;
+                margin-top: 0.25rem;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+              }
+
+              .vip-note {
+                color: #c00;
+                font-weight: bold;
+                margin-bottom: 1rem;
+              }
+              .service-type-badge {
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.25rem 0.5rem;
+                border-radius: 12px;
+                text-transform: uppercase;
+                margin-left: 0.5rem;
+              }
+
+              .service-type-badge.standard {
+                background-color: #e0f7fa;
+                color: #006064;
+              }
+
+              .service-type-badge.vip {
+                background-color: #ffebee;
+                color: #c62828;
+              }
+            `}</style>
+            {/* Modal */}
+            {isModalOpen && selectedService && (
+              <div className="modal-overlay" onClick={closeModal}>
+                <div
+                  className="modal-content"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button className="modal-close" onClick={closeModal}>
+                    ×
+                  </button>
+
+                  {/* Titre */}
+                  <h2>{selectedService.title}</h2>
+                  <p>{selectedService.desc}</p>
+
+                  {/* Prix et toggle */}
+                  {selectedService.vipPrice ? (
+                    // Si c'est un service VIP, on affiche deux boutons
+                    <div className="price-toggle-container">
+                      <div
+                        className={`price-option ${
+                          selectedService.type === "Standard" ? "active" : ""
+                        }`}
+                        onClick={() => setType("Standard")}
+                      >
+                        <span>{selectedService.type}</span>
+                        <span>{selectedService.price}</span>
+                      </div>
+                      <div
+                        className={`price-option ${
+                          selectedService.type === "Standard" ? "active" : ""
+                        }`}
+                        onClick={() => setType("Standard")}
+                      >
+                        <span>{selectedService.type}</span>
+                        <span>{selectedService.price}</span>
+                      </div>
+
+                      <div
+                        className={`price-option ${
+                          selectedService.type === "VIP" ? "active" : ""
+                        }`}
+                        onClick={() => setType("VIP")}
+                      >
+                        <span>{selectedService.type}</span>
+                        <span>{selectedService.price}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    // Sinon on affiche juste le bouton Standard
+                    <div className="price-toggle-container">
+                      <div className="price-option active">
+                        <span>{selectedService.type}</span>
+                        <span>{selectedService.price}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contenu VIP uniquement si VIP sélectionné */}
+                  {selectedService.type === "VIP" && selectedService.price && (
+                    <div className="vip-swipe">
+                      <p className="vip-note">
+                        Contenu VIP : Informations supplémentaires et options
+                        exclusives disponibles.
+                      </p>
+                      {/* Ici tu peux mettre un carousel ou swipe */}
+                    </div>
+                  )}
+
+                  {/* Formulaire de réservation */}
+                  <form className="modal-form" onSubmit={reservationSubmit}>
+                    <label>
+                      Nom complet:
+                      <input
+                        type="text"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        required
+                      />
+                    </label>
+
+                    <label>
+                      Email:
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </label>
+
+                    <label>
+                      Téléphone:
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                      />
+                    </label>
+
+                    <label>
+                      Date souhaitée:
+                      <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                      />
+                    </label>
+
+                    <button type="submit" className="btn-primary">
+                      Confirmer la réservation
+                    </button>
+                  </form>
+
+                  <style jsx>{`
+                    .price-toggle-container {
+                      display: flex;
+                      gap: 1rem;
+                      margin: 1rem 0;
+                    }
+
+                    .price-option {
+                      flex: 1;
+                      padding: 1rem;
+                      border-radius: 12px;
+                      border: 1px solid #ccc;
+                      background: #f9f9f9;
+                      text-align: center;
+                      cursor: pointer;
+                      transition: all 0.2s;
+                    }
+
+                    .price-option.active {
+                      background: var(--brand-primary);
+                      color: white;
+                      border-color: var(--brand-primary);
+                    }
+
+                    .price-option span:first-child {
+                      display: block;
+                      font-weight: 600;
+                    }
+
+                    .vip-note {
+                      color: #c62828;
+                      font-weight: 600;
+                      margin-bottom: 1rem;
+                    }
+                  `}</style>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -90,44 +374,48 @@ const Services = () => {
               Une approche méthodique pour des résultats durables
             </p>
           </div>
-          
+
           <div className="process-steps">
             <div className="process-step">
               <div className="step-number">01</div>
               <div className="step-content">
                 <h3 className="heading-3">Évaluation Complète</h3>
                 <p className="body-medium">
-                  Analyse approfondie de votre état de santé, historique médical et habitudes alimentaires actuelles.
+                  Analyse approfondie de votre état de santé, historique médical
+                  et habitudes alimentaires actuelles.
                 </p>
               </div>
             </div>
-            
+
             <div className="process-step">
               <div className="step-number">02</div>
               <div className="step-content">
                 <h3 className="heading-3">Plan Personnalisé</h3>
                 <p className="body-medium">
-                  Création d'un protocole sur mesure incluant alimentation, supplémentation et mode de vie.
+                  Création d'un protocole sur mesure incluant alimentation,
+                  supplémentation et mode de vie.
                 </p>
               </div>
             </div>
-            
+
             <div className="process-step">
               <div className="step-number">03</div>
               <div className="step-content">
                 <h3 className="heading-3">Mise en Œuvre</h3>
                 <p className="body-medium">
-                  Accompagnement étape par étape dans l'application de votre nouveau protocole de santé.
+                  Accompagnement étape par étape dans l'application de votre
+                  nouveau protocole de santé.
                 </p>
               </div>
             </div>
-            
+
             <div className="process-step">
               <div className="step-number">04</div>
               <div className="step-content">
                 <h3 className="heading-3">Suivi & Ajustements</h3>
                 <p className="body-medium">
-                  Évaluation régulière des résultats et ajustements du protocole selon vos progrès.
+                  Évaluation régulière des résultats et ajustements du protocole
+                  selon vos progrès.
                 </p>
               </div>
             </div>
@@ -142,9 +430,10 @@ const Services = () => {
             <div className="conditions-text">
               <h2 className="heading-1">Pathologies Traitées</h2>
               <p className="body-large">
-                Notre approche naturelle a fait ses preuves sur de nombreuses maladies chroniques
+                Notre approche naturelle a fait ses preuves sur de nombreuses
+                maladies chroniques
               </p>
-              
+
               <div className="conditions-grid">
                 <div className="condition-category">
                   <h4 className="heading-3">Troubles Métaboliques</h4>
@@ -155,7 +444,7 @@ const Services = () => {
                     <li>Obésité</li>
                   </ul>
                 </div>
-                
+
                 <div className="condition-category">
                   <h4 className="heading-3">Maladies Cardiovasculaires</h4>
                   <ul className="condition-list">
@@ -165,7 +454,7 @@ const Services = () => {
                     <li>Insuffisance cardiaque légère</li>
                   </ul>
                 </div>
-                
+
                 <div className="condition-category">
                   <h4 className="heading-3">Troubles Digestifs</h4>
                   <ul className="condition-list">
@@ -175,7 +464,7 @@ const Services = () => {
                     <li>Dysbiose intestinale</li>
                   </ul>
                 </div>
-                
+
                 <div className="condition-category">
                   <h4 className="heading-3">Inflammations Chroniques</h4>
                   <ul className="condition-list">
@@ -187,7 +476,7 @@ const Services = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="success-stats">
               <div className="stat-box">
                 <div className="stat-number">85%</div>
@@ -447,19 +736,19 @@ const Services = () => {
           .services-page {
             padding-top: 80px;
           }
-          
+
           .services-grid {
             grid-template-columns: 1fr;
           }
-          
+
           .process-steps {
             grid-template-columns: 1fr;
           }
-          
+
           .conditions-content {
             grid-template-columns: 1fr;
           }
-          
+
           .conditions-grid {
             grid-template-columns: 1fr;
           }

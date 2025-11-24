@@ -1,3 +1,13 @@
+@font-face {
+  font-family: 'Feel';
+  src: url('./fonts/Feel.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+span.network-logo{
+  font-family: 'Feel', sans-serif;
+  font-size: 1.5rem; /* ajuste selon ton besoin */
+}
 /* Reset and base styles */
 * {
   box-sizing: border-box;

@@ -1,6 +1,6 @@
 import { BellIcon, Bars3Icon } from "@heroicons/react/24/outline";
 
-export default function NavbarDashboard({ onMenuClick }) {
+export default function NavbarDashboard({ onMenuClick, user }) {
   return (
     <div className="flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3 shadow-sm w-full">
       
@@ -16,11 +16,21 @@ export default function NavbarDashboard({ onMenuClick }) {
       </h1>
 
       <div className="flex items-center gap-4 ml-auto">
+
+        {/* 🔔 Notifications */}
         <button className="relative p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
           <BellIcon className="h-5 w-5" />
           <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500"></span>
         </button>
-        <div className="h-8 w-8 rounded-full bg-gray-300"></div>
+
+        {/* 👤 Nom + Avatar */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">
+            {user?.name || "Utilisateur"}
+          </span>
+          <div className="h-8 w-8 rounded-full bg-gray-300"></div>
+        </div>
+
       </div>
     </div>
   );

@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, Clock, User, Search, Filter, ArrowRight, BookOpen, Download } from "lucide-react";
 import { mockData } from "../data/mockData";
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = [
     { value: 'all', label: 'Tous les articles' },
@@ -13,13 +15,6 @@ const Resources = () => {
     { value: 'Santé digestive', label: 'Santé digestive' },
     { value: 'Maladies chroniques', label: 'Maladies chroniques' }
   ];
-
-  const filteredArticles = mockData.blogArticles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
 
   const guides = [
     {
@@ -47,6 +42,31 @@ const Resources = () => {
       type: "PDF"
     }
   ];
+  
+
+  useEffect(() => {
+    fetch("http://localhost:5000/articles")
+      .then(res => res.json())
+      .then(data => {
+        setArticles(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erreur récupération articles :", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredArticles = articles.filter(article => {
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (article.subtitle && article.subtitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (article.content && article.content.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || (article.tags && JSON.parse(article.tags).includes(selectedCategory));
+    return matchesSearch && matchesCategory;
+  });
+
+  if (loading) return <p>Chargement des articles...</p>;
 
   return (
     <div className="resources-page">
@@ -55,8 +75,7 @@ const Resources = () => {
         <div className="container">
           <h1 className="display-medium">Ressources & Blog</h1>
           <p className="body-large">
-            Découvrez nos articles, guides et ressources pour approfondir vos connaissances 
-            en nutrition thérapeutique et alimentation vivante.
+            Découvrez nos articles et guides pour approfondir vos connaissances.
           </p>
         </div>
       </section>
@@ -71,16 +90,15 @@ const Resources = () => {
                 type="text"
                 placeholder="Rechercher un article..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="search-input"
               />
             </div>
-            
             <div className="filter-bar">
               <Filter size={20} />
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={e => setSelectedCategory(e.target.value)}
                 className="filter-select"
               >
                 {categories.map(category => (
@@ -95,44 +113,41 @@ const Resources = () => {
       </section>
 
       {/* Featured Article */}
-      <section className="featured-section">
-        <div className="container">
-          <div className="featured-article">
-            <div className="featured-content">
-              <div className="featured-badge">Article vedette</div>
-              <h2 className="heading-1">{mockData.blogArticles[0].title}</h2>
-              <p className="body-large">{mockData.blogArticles[0].excerpt}</p>
-              
-              <div className="article-meta">
-                <div className="meta-item">
-                  <User size={16} />
-                  <span>{mockData.blogArticles[0].author}</span>
+      {filteredArticles.length > 0 && (
+        <section className="featured-section">
+          <div className="container">
+            <div className="featured-article">
+              <div className="featured-content">
+                <div className="featured-badge">Article vedette</div>
+                <h2 className="heading-1">{filteredArticles[0].title}</h2>
+                <p className="body-large">{filteredArticles[0].subtitle}</p>
+                <div className="article-meta">
+                  <div className="meta-item">
+                    <User size={16} /> <span>{filteredArticles[0].author}</span>
+                  </div>
+                  <div className="meta-item">
+                    <Calendar size={16} /> <span>{new Date(filteredArticles[0].published_date).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                  <div className="meta-item">
+                    <Clock size={16} /> <span>{filteredArticles[0].read_time}</span>
+                  </div>
                 </div>
-                <div className="meta-item">
-                  <Calendar size={16} />
-                  <span>{new Date(mockData.blogArticles[0].date).toLocaleDateString('fr-FR')}</span>
-                </div>
-                <div className="meta-item">
-                  <Clock size={16} />
-                  <span>{mockData.blogArticles[0].readTime}</span>
-                </div>
+                <button className="btn-primary featured-cta">
+                  Lire l'article complet <ArrowRight size={20} />
+                </button>
               </div>
-              
-              <button className="btn-primary featured-cta">
-                Lire l'article complet
-                <ArrowRight size={20} />
-              </button>
-            </div>
-            
-            <div className="featured-image">
-              <div className="image-placeholder">
-                <BookOpen size={64} />
-                <div className="category-tag">{mockData.blogArticles[0].category}</div>
+              <div className="featured-image">
+                <div className="image-placeholder">
+                  {filteredArticles[0].image ? <img src={filteredArticles[0].image} alt={filteredArticles[0].title} /> : <BookOpen size={64} />}
+                  {filteredArticles[0].tags && JSON.parse(filteredArticles[0].tags).map((tag, idx) => (
+                    <div key={idx} className="category-tag">{tag}</div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Articles Grid */}
       <section className="articles-section">
@@ -140,35 +155,31 @@ const Resources = () => {
           <div className="section-header">
             <h2 className="heading-1">Tous nos Articles</h2>
             <p className="body-large">
-              {filteredArticles.length} article{filteredArticles.length > 1 ? 's' : ''} 
-              {selectedCategory !== 'all' ? ` dans ${categories.find(c => c.value === selectedCategory)?.label}` : ''}
+              {filteredArticles.length} article{filteredArticles.length > 1 ? 's' : ''}
             </p>
           </div>
-          
           <div className="articles-grid">
-            {filteredArticles.map((article) => (
+            {filteredArticles.map(article => (
               <article key={article.id} className="article-card">
                 <div className="article-image">
                   <div className="article-image-placeholder">
-                    <BookOpen size={32} />
+                    {article.image ? <img src={article.image} alt={article.title} /> : <BookOpen size={32} />}
                   </div>
-                  <div className="article-category">{article.category}</div>
+                  {article.tags && JSON.parse(article.tags).map((tag, idx) => (
+                    <div key={idx} className="article-category">{tag}</div>
+                  ))}
                 </div>
-                
                 <div className="article-content">
                   <h3 className="heading-3">{article.title}</h3>
-                  <p className="body-medium">{article.excerpt}</p>
-                  
+                  <p className="body-medium">{article.subtitle}</p>
                   <div className="article-footer">
                     <div className="article-meta">
                       <span className="author">{article.author}</span>
-                      <span className="date">{new Date(article.date).toLocaleDateString('fr-FR')}</span>
-                      <span className="read-time">{article.readTime}</span>
+                      <span className="date">{new Date(article.published_date).toLocaleDateString('fr-FR')}</span>
+                      <span className="read-time">{article.read_time}</span>
                     </div>
-                    
                     <button className="read-more-btn">
-                      Lire plus
-                      <ArrowRight size={16} />
+                      Lire plus <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>

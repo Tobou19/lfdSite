@@ -2,7 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-
+@font-face {
+  font-family: 'Feel';
+  src: url('./fonts/Feel.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+.network-logo span {
+  font-family: 'Feel', sans-serif;
+  font-size: 1.5rem; /* ajuste selon ton besoin */
+}
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight, Heart, Users, Award, TrendingUp } from "lucide-react";
+import { ChevronRight, Heart, Users, Award, TrendingUp, Calendar, User } from "lucide-react";
 import { mockData } from "../data/mockData";
+import axios from "axios";
+import SplitText from "@/components/split/split";
 
 const Home = () => {
   const [animatedStats, setAnimatedStats] = useState(false);
@@ -13,33 +15,91 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/services")
+      .then(res => res.json())
+      .then(data => setServices(data))
+      .catch(err => console.error("Erreur fetch services:", err));
+  }, []);
+
+  const [testimonials, setTestimonials] = useState([]);
+
+  const API_URL = "http://localhost:5000/testimonials"; // adapte à ton backend
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await axios.get(API_URL);
+        setTestimonials(res.data);
+      } catch (err) {
+        console.error("Erreur lors de la récupération :", err);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  const handleAnimationComplete = () => {
+    console.log("Animation terminée !");
+  };
+
   return (
     <div className="home-page">
       {/* Hero Section */}
+{/* 
+      <SplitText
+  text="Hello, GSAP!"
+  className="text-2xl font-semibold text-center"
+  delay={100}
+  duration={0.6}
+  ease="power3.out"
+  splitType="chars"
+  from={{ opacity: 0, y: 40 }}
+  to={{ opacity: 1, y: 0 }}
+  threshold={0.1}
+  rootMargin="-100px"
+  textAlign="center"
+  onLetterAnimationComplete={handleAnimationComplete}
+/> */}
       <section className="hero-section">
-        <div className="container">
-          <div className="hero-content">
-            <h1 className="display-large animated fadeIn">
-              {mockData.hero.title}
-            </h1>
-            <p className="body-large animated fadeIn delay-200ms">
-              {mockData.hero.subtitle}
-            </p>
-            <p className="body-medium animated fadeIn delay-500ms">
-              {mockData.hero.description}
-            </p>
-            <div className="hero-actions animated fadeIn delay-500ms">
-              <Link to="/contact" className="btn-cta">
-                {mockData.hero.cta}
-                <ChevronRight size={20} />
-              </Link>
-              <Link to="/services" className="btn-secondary">
-                {mockData.hero.secondaryCta}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div className="container">
+    <div className="hero-content">
+      <SplitText
+        text={mockData.hero.title} // ton titre principal
+        tag="h1"
+        className="display-large animated fadeIn"
+        delay={100}
+        duration={0.6}
+        ease="power3.out"
+        splitType="chars" // "chars" pour caractères, "words" pour mots
+        from={{ opacity: 0, y: 40 }}
+        to={{ opacity: 1, y: 0 }}
+        threshold={0.1}
+        rootMargin="-100px"
+        textAlign="center"
+        onLetterAnimationComplete={() => console.log("Animation titre terminée !")}
+      />
+      <p className="body-large animated fadeIn delay-200ms">
+        {mockData.hero.subtitle}
+      </p>
+      <p className="body-medium animated fadeIn delay-500ms">
+        {mockData.hero.description}
+      </p>
+      <div className="hero-actions animated fadeIn delay-500ms">
+        <Link to="/contact" className="btn-cta">
+          {mockData.hero.cta}
+          <ChevronRight size={20} />
+        </Link>
+        <Link to="/services" className="btn-secondary">
+          {mockData.hero.secondaryCta}
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Stats Section */}
       <section className="stats-section">
@@ -66,7 +126,7 @@ const Home = () => {
           </div>
           
           <div className="network-grid">
-            {mockData.services.slice(0, 4).map((service) => (
+            {services.slice(0, 4).map((service) => (
               <div key={service.id} className="network-card service-card">
                 <div className="service-header">
                   <Heart size={32} className="service-icon" />
@@ -142,42 +202,137 @@ const Home = () => {
 
       {/* Testimonials Preview */}
       <section className="testimonials-preview">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="heading-1">Ce que disent nos bénéficiaires</h2>
-            <p className="body-large">Des résultats concrets qui changent des vies</p>
-          </div>
-          
-          <div className="testimonials-grid">
-            {mockData.testimonials.slice(0, 2).map((testimonial) => (
-              <div key={testimonial.id} className="network-card testimonial-card">
-                <div className="testimonial-header">
-                  <div className="beneficiary-info">
-                    <h4 className="heading-3">{testimonial.name}</h4>
-                    <span className="body-small">{testimonial.age} ans • {testimonial.condition}</span>
-                  </div>
-                  <div className="testimonial-result">
-                    <div className="result-label body-small">Résultat</div>
-                    <div className="result-value body-medium">{testimonial.result}</div>
-                  </div>
-                </div>
-                <blockquote className="body-large">
-                  "{testimonial.testimonial}"
-                </blockquote>
-                <div className="testimonial-duration body-small">
-                  Suivi sur {testimonial.duration}
-                </div>
+  <div className="container">
+    <div className="section-header">
+      <h2 className="heading-1">Ce que disent nos bénéficiaires</h2>
+      <p className="body-large">Des résultats concrets qui changent des vies</p>
+    </div>
+
+    <div className="testimonials-grid">
+      {testimonials.length > 0 ? (
+        testimonials.slice(0, 4).map((t) => (
+          <div key={t.id} className="testimonial-card">
+            <div className="testimonial-header">
+              <div className="beneficiary-avatar">
+                <User size={28} />
               </div>
-            ))}
+              <div className="beneficiary-info">
+                <h4 className="heading-3">{t.full_name}</h4>
+                <span className="body-small">{t.age} ans • {t.condition_name}</span>
+              </div>
+            </div>
+
+            <blockquote className="testimonial-quote">
+              "{t.testimonial_text}"
+            </blockquote>
+
+            <div className="testimonial-results">
+              <div className="result-item">
+                <TrendingUp size={20} />
+                <span>Résultat : <strong>{t.result_value}</strong></span>
+              </div>
+              <div className="result-item">
+                <Calendar size={16} />
+                <span>Suivi sur {t.follow_up_duration}</span>
+              </div>
+            </div>
+
+            {t.verified && <div className="testimonial-badge">Témoignage vérifié</div>}
           </div>
-          
-          <div className="section-cta">
-            <Link to="/témoignages" className="btn-primary">
-              Lire tous les témoignages
-            </Link>
-          </div>
-        </div>
-      </section>
+        ))
+      ) : (
+        <p>Aucun témoignage disponible pour le moment.</p>
+      )}
+    </div>
+
+    <div className="section-cta">
+      <Link to="/témoignages" className="btn-primary">
+        Lire tous les témoignages
+      </Link>
+    </div>
+  </div>
+
+  <style jsx>{`
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--spacing-large);
+    }
+
+    .testimonial-card {
+      background: var(--bg-card);
+      border-left: 4px solid var(--brand-primary);
+      border-radius: 24px;
+      padding: var(--spacing-large);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .testimonial-header {
+      display: flex;
+      gap: var(--spacing-medium);
+      align-items: center;
+      margin-bottom: var(--spacing-medium);
+    }
+
+    .beneficiary-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--brand-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .testimonial-quote {
+      font-style: italic;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-medium);
+      line-height: 1.6;
+    }
+
+    .testimonial-results {
+      display: flex;
+      gap: var(--spacing-large);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-medium);
+    }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .testimonial-badge {
+      background: var(--brand-primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      width: fit-content;
+    }
+
+    @media (max-width: 781px) {
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  `}</style>
+</section>
+
 
       {/* CTA Section */}
       <section className="cta-section">

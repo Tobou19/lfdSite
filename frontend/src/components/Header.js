@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import logo from "../images/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,16 +14,21 @@ const Header = () => {
     { name: "Équipe", path: "/equipe" },
     { name: "Témoignages", path: "/témoignages" },
     { name: "Contact", path: "/contact" },
-    { name: "Ressources", path: "/ressources" }
+    { name: "Ressources", path: "/ressources" },
   ];
 
   return (
     <header className="network-header">
       <div className="nav-wrapper">
-        <Link to="/" className="network-logo">
-          (LFD)-Services
+        <Link to="/" className="flex gap-2 justify-center items-center">
+          <img src={logo} className="size-10" alt="Logo" />
+          <div className="flex gap-1 justify-center items-center">
+            <span className="text-white font-bold">(</span>{" "}
+            <span className="network-logo">L</span>{" "}
+            <span className="text-white font-bold">.FD)-Services</span>
+          </div>
         </Link>
-        
+
         {/* Desktop Navigation */}
         <nav className="network-nav desktop-nav">
           {navigation.map((item) => (
@@ -158,16 +164,16 @@ const Header = () => {
             top: 0;
             position: fixed;
           }
-          
+
           .nav-wrapper {
             border-radius: 0;
             padding: 16px;
           }
-          
+
           .desktop-nav {
             display: none;
           }
-          
+
           .mobile-menu-btn {
             display: block;
           }
@@ -177,7 +183,7 @@ const Header = () => {
           .desktop-nav {
             gap: 16px;
           }
-          
+
           .network-nav-link {
             font-size: 14px;
             padding: 6px 12px;

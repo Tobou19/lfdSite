@@ -10,6 +10,12 @@ const db = require("./config/db.config.js");
 const jwt = require("jsonwebtoken");
 const beneficiaresRouter = require("./routes/beneficiares.routes.js");
 const carnetRouter = require("./routes/carnet.routes.js");
+const servicesRouter = require("./routes/services.routes.js");
+const reservationsRouter = require("./routes/reservations.routes.js");
+const testimonialsRouter = require("./routes/testimonials.routes.js");
+const teamRouter = require("./routes/team.routes.js");
+const articlesRouter = require("./routes/articles.routes.js");
+const usersRouter = require("./routes/users.routes.js");
 
 
 app.use(cors());
@@ -70,6 +76,8 @@ app.post("/api/login", (req, res) => {
       process.env.JWT_SECRET || "jkAZ9sJH8aSD7as8d7asd8A7D8A7d8ASD7as8d7A8SD7A8s7d8AS87D",
       { expiresIn: "7d" }
     );
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
 
     res.json({
       message: "Authentification réussie",
@@ -117,7 +125,12 @@ app.post("/api/contact", (req, res) => {
 
 app.use("/beneficiaires",beneficiaresRouter);
 app.use("/carnet",carnetRouter);
-
+app.use("/services",servicesRouter);
+app.use("/reservations",reservationsRouter);
+app.use("/testimonials",testimonialsRouter);
+app.use("/team",teamRouter);
+app.use("/articles",articlesRouter);
+app.use("/users",usersRouter);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);

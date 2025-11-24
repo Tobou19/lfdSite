@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus, Video, Eye, EyeOff, FileText, X } from "lucide-react";
 
 export default function ServicesPage() {
@@ -10,7 +10,7 @@ export default function ServicesPage() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {["services", "therapy", "articles"].map((t) => (
+        {["services", "therapy", "articles", "reservations"].map((t) => (
           <button
             key={t}
             className={`px-4 py-1 rounded-md ${
@@ -22,7 +22,9 @@ export default function ServicesPage() {
               ? "Services"
               : t === "therapy"
               ? "Psychothérapie vidéo"
-              : "Articles"}
+              : t === "articles"
+              ? "Articles"
+              : "Réservations"}
           </button>
         ))}
       </div>
@@ -31,6 +33,7 @@ export default function ServicesPage() {
       {tab === "services" && <ServicesTab />}
       {tab === "therapy" && <TherapyTab />}
       {tab === "articles" && <ArticlesTab />}
+      {tab === "reservations" && <ReservationsTable />}
     </div>
   );
 }
@@ -39,40 +42,87 @@ export default function ServicesPage() {
         SERVICES
 ------------------------------ */
 function ServicesTab() {
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      price: "120€",
-      duration: "90 min",
-      title: "Consultation Nutritionnelle",
-      desc: "Bilan personnalisé.",
-      includes: ["Bilan complet", "Plan personnalisé", "Suivi"],
-      active: true,
-    },
-  ]);
+  const [services, setServices] = useState([]);
+  const [form, setForm] = useState(null);
 
-  const [form, setForm] = useState(null); // null ou objet pour edit
-  const toggleActive = (id) =>
-    setServices(services.map((s) => (s.id === id ? { ...s, active: !s.active } : s)));
-  const removeService = (id) => setServices(services.filter((s) => s.id !== id));
+  // -- 1. Charger services depuis backend --
+  const loadServices = async () => {
+    const res = await fetch("http://localhost:5000/services");
+    const data = await res.json();
+    setServices(data);
+  };
 
-  const openForm = (service = null) => setForm(service ?? { title: "", price: "", duration: "", desc: "", includes: [""] });
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+const openForm = (service = null) =>
+  setForm(
+    service ?? {
+      title: "",
+      price: "",
+      duration: "",
+      desc: "",
+      includes: [""],
+      type: "Standard", 
+    }
+  );
+
+
   const closeForm = () => setForm(null);
 
-  const saveService = (e) => {
+  // -- 3. Sauvegarder service (edit + create) --
+  const saveService = async (e) => {
     e.preventDefault();
+
+    const body = {
+      title: form.title,
+      price: form.price,
+      duration: form.duration,
+      desc: form.desc,
+      includes: form.includes,
+      active: form.active ?? true,
+    };
+
     if (form.id) {
       // update
-      setServices(services.map((s) => (s.id === form.id ? form : s)));
+      await fetch(`http://localhost:5000/services/update/${form.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
     } else {
       // create
-      setServices([...services, { ...form, id: Date.now(), active: true }]);
+      await fetch("http://localhost:5000/services/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
     }
+
     closeForm();
+    loadServices();
+  };
+
+  // -- 4. Toggle active --
+  const toggleActive = async (id) => {
+    await fetch(`http://localhost:5000/services/toggle/${id}`, {
+      method: "PATCH",
+    });
+    loadServices();
+  };
+
+  // -- 5. Supprimer --
+  const removeService = async (id) => {
+    await fetch(`http://localhost:5000/services/delete/${id}`, {
+      method: "DELETE",
+    });
+    loadServices();
   };
 
   return (
     <div>
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-lg font-bold text-gray-700">Tous les services</h2>
         <button
@@ -83,41 +133,58 @@ function ServicesTab() {
         </button>
       </div>
 
+      {/* Formulaire */}
       {form && (
         <form
           onSubmit={saveService}
           className="bg-gray-50 p-4 mb-4 rounded-md border flex flex-col gap-2"
         >
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-gray-700">{form.id ? "Modifier Service" : "Nouveau Service"}</h3>
+            <h3 className="font-bold text-gray-700">
+              {form.id ? "Modifier Service" : "Nouveau Service"}
+            </h3>
             <button type="button" onClick={closeForm}>
               <X className="w-5 h-5 text-gray-600" />
             </button>
           </div>
+
           <input
             placeholder="Titre"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             className="border p-2 rounded"
           />
+          <select
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+            className="border p-2 rounded"
+          >
+            <option value="Standard">Standard</option>
+            <option value="VIP">VIP</option>
+          </select>
+
           <input
             placeholder="Prix"
             value={form.price}
             onChange={(e) => setForm({ ...form, price: e.target.value })}
             className="border p-2 rounded"
           />
+
           <input
             placeholder="Durée"
             value={form.duration}
             onChange={(e) => setForm({ ...form, duration: e.target.value })}
             className="border p-2 rounded"
           />
+
           <textarea
             placeholder="Description"
             value={form.desc}
             onChange={(e) => setForm({ ...form, desc: e.target.value })}
             className="border p-2 rounded"
           />
+
+          {/* includes */}
           <div>
             <label className="font-semibold">Inclus:</label>
             {form.includes.map((inc, idx) => (
@@ -145,28 +212,49 @@ function ServicesTab() {
             ))}
             <button
               type="button"
-              onClick={() => setForm({ ...form, includes: [...form.includes, ""] })}
+              onClick={() =>
+                setForm({ ...form, includes: [...form.includes, ""] })
+              }
               className="bg-green-100 px-2 rounded mt-1"
             >
               Ajouter inclus
             </button>
           </div>
-          <button type="submit" className="bg-violet-600 text-white px-4 py-1 rounded mt-2">
+
+          <button
+            type="submit"
+            className="bg-violet-600 text-white px-4 py-1 rounded mt-2"
+          >
             {form.id ? "Sauvegarder" : "Créer"}
           </button>
         </form>
       )}
 
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {services.map((s) => (
-          <ServiceCard key={s.id} service={s} toggleActive={toggleActive} removeService={removeService} openForm={openForm} />
+          <ServiceCard
+            key={s.id}
+            service={s}
+            toggleActive={toggleActive}
+            removeService={removeService}
+            openForm={openForm}
+          />
         ))}
       </div>
     </div>
   );
 }
 
+
 function ServiceCard({ service, toggleActive, removeService, openForm }) {
+  // Fonction de suppression avec confirmation
+  const handleDelete = () => {
+    if (window.confirm(`Voulez-vous vraiment supprimer "${service.title}" ?`)) {
+      removeService(service.id);
+    }
+  };
+
   return (
     <div className="bg-white rounded-md shadow p-4 flex flex-col gap-2">
       <h1 className="text-xl font-bold">{service.price}</h1>
@@ -181,16 +269,19 @@ function ServiceCard({ service, toggleActive, removeService, openForm }) {
           </span>
         ))}
       </div>
-      <div className="flex justify-between mt-3">
+
+      {/* Boutons d'action réduits */}
+      <div className="flex justify-between mt-3 text-xs gap-1">
         <button
-          className="px-2 py-1 rounded bg-blue-100 text-blue-600 flex items-center gap-1"
+          className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 flex items-center gap-1"
           onClick={() => openForm(service)}
         >
           <Pencil className="w-3 h-3" />Modifier
         </button>
+
         <button
           onClick={() => toggleActive(service.id)}
-          className={`px-2 py-1 rounded flex items-center gap-1 ${
+          className={`px-2 py-0.5 rounded flex items-center gap-1 ${
             service.active ? "bg-yellow-100 text-yellow-600" : "bg-green-100 text-green-600"
           }`}
         >
@@ -204,9 +295,10 @@ function ServiceCard({ service, toggleActive, removeService, openForm }) {
             </>
           )}
         </button>
+
         <button
-          onClick={() => removeService(service.id)}
-          className="px-2 py-1 rounded bg-red-100 text-red-600 flex items-center gap-1"
+          onClick={handleDelete}
+          className="px-2 py-0.5 rounded bg-red-100 text-red-600 flex items-center gap-1"
         >
           <Trash2 className="w-3 h-3" />Supprimer
         </button>
@@ -214,6 +306,7 @@ function ServiceCard({ service, toggleActive, removeService, openForm }) {
     </div>
   );
 }
+
 
 /* -----------------------------
         THÉRAPIE VIDÉO
@@ -355,27 +448,183 @@ function TherapyTab() {
 }
 
 /* -----------------------------
+        RÉSERVATIONS
+------------------------------ */
+function ReservationsTable() {
+  const [reservations, setReservations] = useState([]);
+
+  // Charger les réservations depuis le backend
+  useEffect(() => {
+    fetch("http://localhost:5000/reservations")
+      .then((res) => res.json())
+      .then((data) => setReservations(data))
+      .catch((err) => console.error("Erreur fetch reservations:", err));
+  }, []);
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-lg font-bold text-gray-700 mb-4">Réservations récentes</h2>
+      <div className="overflow-x-auto bg-white rounded-md shadow">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nom
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Service
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Téléphone
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Statut
+              </th>
+              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {reservations.map((r) => (
+              <tr key={r.id}>
+                <td className="px-4 py-2 text-sm text-gray-700">{r.clientName}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{r.serviceTitle}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{r.phone}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{new Date(r.date).toLocaleString()}</td>
+                <td className="px-4 py-2 text-sm">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      r.status === "confirmed"
+                        ? "bg-green-100 text-green-700"
+                        : r.status === "pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-sm text-right flex justify-end gap-2">
+                  <button className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">
+                    Voir
+                  </button>
+                  <button className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {reservations.length === 0 && (
+          <p className="text-center text-gray-400 p-4">Aucune réservation trouvée</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+/* -----------------------------
         ARTICLES
 ------------------------------ */
 function ArticlesTab() {
-  const [articles, setArticles] = useState([
-    { id: 1, title: "Bienfaits de la nutrition", img: "https://picsum.photos/300/200", excerpt: "Alimentation saine et mental.", active: true },
-  ]);
-
+  const [articles, setArticles] = useState([]);
   const [form, setForm] = useState(null);
-  const toggleActive = (id) => setArticles(articles.map((a) => (a.id === id ? { ...a, active: !a.active } : a)));
-  const removeArticle = (id) => setArticles(articles.filter((a) => a.id !== id));
-  const openForm = (a = null) => setForm(a ?? { title: "", img: "", excerpt: "" });
-  const closeForm = () => setForm(null);
-  const saveArticle = (e) => {
-    e.preventDefault();
-    if (form.id) {
-      setArticles(articles.map((a) => (a.id === form.id ? form : a)));
-    } else {
-      setArticles([...articles, { ...form, id: Date.now(), active: true }]);
+
+  // Charger articles depuis backend
+  const loadArticles = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/articles");
+      const data = await res.json();
+      setArticles(data);
+    } catch (err) {
+      console.error("Erreur fetch articles:", err);
     }
-    closeForm();
   };
+
+  useEffect(() => {
+    loadArticles();
+  }, []);
+
+  const openForm = (a = null) =>
+    setForm(
+      a ?? {
+        title: "",
+        subtitle: "",
+        content: "",
+        author: "",
+        published_date: "",
+        read_time: "",
+        tags: [],
+        image: "",
+      }
+    );
+  
+  const closeForm = () => setForm(null);
+  
+
+  const saveArticle = async (e) => {
+    e.preventDefault();
+  
+    const body = {
+      title: form.title,
+      subtitle: form.subtitle,
+      content: form.content,
+      author: form.author,
+      published_date: form.published_date,
+      read_time: form.read_time,
+      tags: form.tags,
+      image: form.image,
+    };
+  
+    try {
+      if (form.id) {
+        // Modifier article existant
+        await fetch(`http://localhost:5000/articles/update/${form.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      } else {
+        // Créer nouvel article
+        await fetch("http://localhost:5000/articles/create/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+      }
+      closeForm();
+      loadArticles();
+    } catch (err) {
+      console.error("Erreur sauvegarde article:", err);
+    }
+  };
+  
+
+  const toggleActive = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/articles/toggle/${id}`, { method: "PATCH" });
+      loadArticles();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+  const removeArticle = async (id) => {
+    if (!window.confirm("Supprimer cet article ?")) return;
+    try {
+      await fetch(`http://localhost:5000/articles/delete/${id}`, { method: "DELETE" });
+      loadArticles();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
 
   return (
     <div>
@@ -390,65 +639,48 @@ function ArticlesTab() {
       </div>
 
       {form && (
-        <form
-          onSubmit={saveArticle}
-          className="bg-gray-50 p-4 mb-4 rounded-md border flex flex-col gap-2"
-        >
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-gray-700">{form.id ? "Modifier Article" : "Nouvel Article"}</h3>
-            <button type="button" onClick={closeForm}>
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-          <input
-            placeholder="Titre"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            className="border p-2 rounded"
-          />
-          <input
-            placeholder="Image URL"
-            value={form.img}
-            onChange={(e) => setForm({ ...form, img: e.target.value })}
-            className="border p-2 rounded"
-          />
-          <textarea
-            placeholder="Extrait"
-            value={form.excerpt}
-            onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-            className="border p-2 rounded"
-          />
-          <button type="submit" className="bg-violet-600 text-white px-4 py-1 rounded mt-2">
-            {form.id ? "Sauvegarder" : "Créer"}
-          </button>
-        </form>
-      )}
+  <form onSubmit={saveArticle} className="bg-gray-50 p-4 mb-4 rounded-md border flex flex-col gap-2">
+    <div className="flex justify-between items-center">
+      <h3 className="font-bold text-gray-700">{form.id ? "Modifier Article" : "Nouvel Article"}</h3>
+      <button type="button" onClick={closeForm}><X className="w-5 h-5 text-gray-600" /></button>
+    </div>
+
+    <input placeholder="Titre" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="border p-2 rounded" />
+    <input placeholder="Sous-titre" value={form.subtitle} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} className="border p-2 rounded" />
+    <textarea placeholder="Contenu" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="border p-2 rounded" />
+    <input placeholder="Auteur" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} className="border p-2 rounded" />
+    <input type="date" placeholder="Date de publication" value={form.published_date} onChange={(e) => setForm({ ...form, published_date: e.target.value })} className="border p-2 rounded" />
+    <input placeholder="Temps de lecture" value={form.read_time} onChange={(e) => setForm({ ...form, read_time: e.target.value })} className="border p-2 rounded" />
+    <input placeholder="Tags (séparés par des virgules)" value={form.tags.join(", ")} onChange={(e) => setForm({ ...form, tags: e.target.value.split(",").map(t => t.trim()) })} className="border p-2 rounded" />
+    <input placeholder="URL ou nom de l'image" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="border p-2 rounded" />
+
+    <button type="submit" className="bg-violet-600 text-white px-4 py-1 rounded mt-2">
+      {form.id ? "Sauvegarder" : "Créer"}
+    </button>
+  </form>
+)}
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {articles.map((a) => (
-          <div key={a.id} className="bg-white rounded-md shadow p-4 flex flex-col gap-2">
-            <img src={a.img} className="rounded-md h-32 w-full object-cover" />
-            <h2 className="font-semibold">{a.title}</h2>
-            <p className="text-sm text-gray-500">{a.excerpt}</p>
-            <div className="flex justify-between mt-3">
-              <button className="px-2 py-1 rounded bg-blue-100 text-blue-600 flex items-center gap-1" onClick={() => openForm(a)}>
-                <Pencil className="w-3 h-3" />Modifier
-              </button>
-              <button
-                onClick={() => toggleActive(a.id)}
-                className={`px-2 py-1 rounded flex items-center gap-1 ${a.active ? "bg-yellow-100 text-yellow-600" : "bg-green-100 text-green-600"}`}
-              >
-                {a.active ? <><EyeOff className="w-3 h-3" />Désactiver</> : <><Eye className="w-3 h-3" />Activer</>}
-              </button>
-              <button
-                onClick={() => removeArticle(a.id)}
-                className="px-2 py-1 rounded bg-red-100 text-red-600 flex items-center gap-1"
-              >
-                <Trash2 className="w-3 h-3" />Supprimer
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {articles.map((a) => (
+    <div key={a.id} className="bg-white rounded-md shadow p-4 flex flex-col gap-2">
+      <img src={a.image} alt={a.title} className="rounded-md h-32 w-full object-cover" />
+      <h2 className="font-semibold">{a.title}</h2>
+      <h3 className="text-sm text-gray-500">{a.subtitle}</h3>
+      <p className="text-xs text-gray-400">{a.author} • {new Date(a.published_date).toLocaleDateString()} • {a.read_time}</p>
+      <p className="text-sm text-gray-500">{a.content.substring(0, 100)}...</p>
+      <div className="flex justify-between mt-3">
+        <button onClick={() => openForm(a)} className="px-2 py-1 rounded bg-blue-100 text-blue-600 flex items-center gap-1"><Pencil className="w-3 h-3" />Modifier</button>
+        <button onClick={() => toggleActive(a.id)} className={`px-2 py-1 rounded flex items-center gap-1 ${a.active ? "bg-yellow-100 text-yellow-600" : "bg-green-100 text-green-600"}`}>
+          {a.active ? <><EyeOff className="w-3 h-3" />Désactiver</> : <><Eye className="w-3 h-3" />Activer</>}
+        </button>
+        <button onClick={() => removeArticle(a.id)} className="px-2 py-1 rounded bg-red-100 text-red-600 flex items-center gap-1"><Trash2 className="w-3 h-3" />Supprimer</button>
+      </div>
+    </div>
+  ))}
+</div>
+
       </div>
     </div>
   );

@@ -1,8 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Star, TrendingUp, Calendar, User } from "lucide-react";
-import { mockData } from "../data/mockData";
+import axios from "axios";
 
 const Testimonials = () => {
+  const [testimonials, setTestimonials] = useState([]);
+
+  const API_URL = "http://localhost:5000/testimonials"; // adapte à ton backend
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await axios.get(API_URL);
+        setTestimonials(res.data);
+      } catch (err) {
+        console.error("Erreur lors de la récupération :", err);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
   return (
     <div className="testimonials-page">
       {/* Hero Section */}
@@ -43,53 +60,58 @@ const Testimonials = () => {
       <section className="testimonials-section">
         <div className="container">
           <div className="testimonials-grid">
-            {mockData.testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="testimonial-card-detailed">
-                <div className="testimonial-header">
-                  <div className="beneficiary-avatar">
-                    <User size={24} />
-                  </div>
-                  <div className="beneficiary-details">
-                    <h3 className="heading-3">{testimonial.name}</h3>
-                    <div className="beneficiary-meta">
-                      <span className="beneficiary-age">{testimonial.age} ans</span>
-                      <span className="beneficiary-condition">{testimonial.condition}</span>
+            {testimonials.length > 0 ? (
+              testimonials.map((testimonial) => (
+                <div key={testimonial.id} className="testimonial-card-detailed">
+                  <div className="testimonial-header">
+                    <div className="beneficiary-avatar">
+                      <User size={24} />
+                    </div>
+                    <div className="beneficiary-details">
+                      <h3 className="heading-3">{testimonial.full_name}</h3>
+                      <div className="beneficiary-meta">
+                        <span className="beneficiary-age">{testimonial.age} ans</span>
+                        <span className="beneficiary-condition">{testimonial.condition_name}</span>
+                      </div>
+                    </div>
+                    <div className="testimonial-rating">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={16} className="star filled" />
+                      ))}
                     </div>
                   </div>
-                  <div className="testimonial-rating">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={16} className="star filled" />
-                    ))}
-                  </div>
-                </div>
-                
-                <blockquote className="testimonial-quote">
-                  "{testimonial.testimonial}"
-                </blockquote>
-                
-                <div className="testimonial-results">
-                  <div className="result-metric">
-                    <TrendingUp size={20} className="result-icon" />
-                    <div className="result-content">
-                      <div className="result-label">Résultat obtenu</div>
-                      <div className="result-value">{testimonial.result}</div>
+
+                  <blockquote className="testimonial-quote">
+                    "{testimonial.testimonial_text}"
+                  </blockquote>
+
+                  <div className="testimonial-results">
+                    <div className="result-metric">
+                      <TrendingUp size={20} className="result-icon" />
+                      <div className="result-content">
+                        <div className="result-label">Résultat obtenu</div>
+                        <div className="result-value">{testimonial.result_value}</div>
+                      </div>
+                    </div>
+                    <div className="result-duration">
+                      <Calendar size={16} />
+                      <span>Suivi sur {testimonial.follow_up_duration}</span>
                     </div>
                   </div>
-                  <div className="result-duration">
-                    <Calendar size={16} />
-                    <span>Suivi sur {testimonial.duration}</span>
+
+                  <div className="testimonial-tags">
+                    {testimonial.verified && <span className="testimonial-tag">Témoignage vérifié</span>}
+                    <span className="testimonial-tag">Résultats authentiques</span>
                   </div>
                 </div>
-                
-                <div className="testimonial-tags">
-                  <span className="testimonial-tag">Témoignage vérifié</span>
-                  <span className="testimonial-tag">Résultats authentiques</span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>Aucun témoignage disponible pour le moment.</p>
+            )}
           </div>
         </div>
       </section>
+
 
       {/* Conditions Success Stories */}
       <section className="conditions-success">
