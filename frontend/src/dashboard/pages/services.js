@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus, Video, Eye, EyeOff, FileText, X } from "lucide-react";
 
+import {
+  RectangleStackIcon,
+  UserIcon,
+  UserGroupIcon,
+  TrophyIcon,
+  XMarkIcon,
+  ArrowLeftOnRectangleIcon,
+  ClipboardDocumentCheckIcon
+} from "@heroicons/react/24/solid";
+
 export default function ServicesPage() {
   const [tab, setTab] = useState("services");
 
@@ -10,7 +20,7 @@ export default function ServicesPage() {
 
       {/* Tabs */}
       <div className="flex gap-2">
-        {["services", "therapy", "articles", "reservations"].map((t) => (
+        {["services", "therapy", "articles", "reservations", "produits"].map((t) => (
           <button
             key={t}
             className={`px-4 py-1 rounded-md ${
@@ -24,6 +34,8 @@ export default function ServicesPage() {
               ? "Psychothérapie vidéo"
               : t === "articles"
               ? "Articles"
+              : t === "produits"
+              ? "Produits"
               : "Réservations"}
           </button>
         ))}
@@ -34,8 +46,152 @@ export default function ServicesPage() {
       {tab === "therapy" && <TherapyTab />}
       {tab === "articles" && <ArticlesTab />}
       {tab === "reservations" && <ReservationsTable />}
+      {tab === "produits" && <ProduitsTab />}
     </div>
   );
+}
+
+
+
+/* -----------------------------
+        PRODUITS
+------------------------------ */
+function ProduitsTab() {
+  const [form, setForm] = useState(null);
+  const products = [
+    {
+      id: 1,
+      name: "Superfood Mix Détox",
+      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+      price: 8500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
+      status: "confirmed"
+    },
+    {
+      id: 2,
+      name: "Thé Minceur Métabolique",
+      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+      price: 6500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
+      status: "confirmed"
+    },
+    {
+      id: 3,
+      name: "Huile de Nigelle Premium",
+      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+      price: 9500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
+      status: "confirmed"
+    },
+    {
+      id: 4,
+      name: "Superfood Mix Détox",
+      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+      price: 8500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
+      status: "confirmed"
+    },
+    {
+      id: 5,
+      name: "Thé Minceur Métabolique",
+      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+      price: 6500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
+      status: "confirmed"
+    },
+    {
+      id: 6,
+      name: "Huile de Nigelle Premium",
+      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+      price: 9500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
+      status: "confirmed"
+    }
+  ];
+
+  const openForm = () => {
+    setForm({
+      title: "",
+      price: "",
+      duration: "",
+      desc: "",
+      includes: [""],
+      type: "Standard", 
+    })
+  }
+  return <div>
+    {/* Header */}
+    <div className="flex justify-between items-center mb-3">
+      <h2 className="text-lg font-bold text-gray-700">Tous les produits</h2>
+      <button
+        className="flex items-center gap-1 bg-violet-600 text-white px-3 py-1 rounded-md"
+        onClick={() => openForm()}
+      >
+        <Plus className="w-4 h-4" /> Ajouter un produit
+      </button>
+    </div>
+
+    <div className="overflow-x-auto bg-white rounded-md shadow">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <UserIcon className="size-6"/>Nom
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <ClipboardDocumentCheckIcon className="size-6"/>Service
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Prix
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Description
+              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Statut
+              </th>
+              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {products.map((p) => (
+              <tr key={p.id}>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.name}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.service}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.price}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.description}</td>
+                <td className="px-4 py-2 text-sm">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      p.status === "confirmed"
+                        ? "bg-green-100 text-green-700"
+                        : p.status === "pending"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-sm text-right flex justify-end gap-2">
+                  <button className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">
+                    Voir
+                  </button>
+                  <button className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {products.length === 0 && (
+          <p className="text-center text-gray-400 p-4">Aucun produit trouvée</p>
+        )}
+      </div>
+  </div>;
 }
 
 /* -----------------------------
@@ -469,10 +625,10 @@ function ReservationsTable() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Nom
+                <UserIcon className="size-6"/>Nom
               </th>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Service
+                <ClipboardDocumentCheckIcon className="size-6"/>Service
               </th>
               <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Téléphone

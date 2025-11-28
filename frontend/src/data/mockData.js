@@ -3,7 +3,7 @@
 export const mockData = {
   // Données pour la page d'accueil
   hero: {
-    title: "Retrouvez votre bien-être naturellement",
+    title: "Retrouvez la pleinitude de votre bien-être naturellement",
     subtitle: "Centre de santé spécialisé dans le traitement des maladies chroniques par l'alimentation vivante",
     description: "Découvrez une approche révolutionnaire pour traiter diabète, hypertension, inflammation chronique et troubles digestifs grâce aux nourritures et boissons vivantes.",
     cta: "Prendre rendez-vous",

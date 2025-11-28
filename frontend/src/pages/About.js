@@ -53,7 +53,7 @@ const About = () => {
       <section className="values-section">
         <div className="container">
           <div className="section-header">
-            <h2 className="heading-1">Nos Valeurs Fondamentales</h2>
+            <h2 className="heading-1">Nos Valeurs Fondamentales (Atouts)</h2>
             <p className="body-large">
               Les principes qui guident notre pratique quotidienne
             </p>

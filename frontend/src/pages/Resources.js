@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Calendar, Clock, User, Search, Filter, ArrowRight, BookOpen, Download } from "lucide-react";
 import { mockData } from "../data/mockData";
+import { useNavigate } from "react-router-dom";
 
 const Resources = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [articles, setArticles] = useState([]);
@@ -15,6 +17,52 @@ const Resources = () => {
     { value: 'Santé digestive', label: 'Santé digestive' },
     { value: 'Maladies chroniques', label: 'Maladies chroniques' }
   ];
+
+  const products = [
+    {
+      id: 1,
+      name: "Superfood Mix Détox",
+      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+      price: 8500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s"
+    },
+    {
+      id: 2,
+      name: "Thé Minceur Métabolique",
+      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+      price: 6500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s"
+    },
+    {
+      id: 3,
+      name: "Huile de Nigelle Premium",
+      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+      price: 9500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s"
+    },
+    {
+      id: 4,
+      name: "Superfood Mix Détox",
+      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+      price: 8500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s"
+    },
+    {
+      id: 5,
+      name: "Thé Minceur Métabolique",
+      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+      price: 6500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s"
+    },
+    {
+      id: 6,
+      name: "Huile de Nigelle Premium",
+      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+      price: 9500,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s"
+    }
+  ];
+  
 
   const guides = [
     {
@@ -188,6 +236,59 @@ const Resources = () => {
           </div>
         </div>
       </section>
+
+      
+      {/* Products Section */}
+<section className="products-section">
+  <div className="container">
+    <div className="section-header">
+      <h2 className="heading-1">Nos Produits Naturels</h2>
+      <p className="body-large">Compléments, thés, poudres nutritionnelles & extraits thérapeutiques</p>
+    </div>
+
+    <div className="products-grid">
+      {products.map(product => (
+        <div key={product.id} className="product-card">
+          <div className="product-image">
+            <img src={product.image} alt={product.name} />
+          </div>
+
+          <div className="product-content">
+            <h3 className="heading-3">{product.name}</h3>
+            <p className="body-medium">{product.description}</p>
+
+            <div className="product-footer">
+              <div className="price">{product.price} FCFA</div>
+              <button onClick={() => navigate(`/produit/${product.id}`)} className="btn-primary product-btn">Voir le produit</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <style jsx>{`
+    .products-section { padding: var(--spacing-giant) 0; background: var(--bg-subtle); }
+    .products-grid {
+      display: grid; gap: var(--spacing-large);
+      grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+    }
+    .product-card {
+      background: var(--bg-card); border-radius: 24px;
+      overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      display: flex; flex-direction: column;
+      transition: .3s;
+    }
+    .product-card:hover { transform: translateY(-4px); }
+    .product-image img { width:100%; height:260px; object-fit:cover; }
+    .product-content { padding: var(--spacing-large); flex:1; display:flex; flex-direction:column; }
+    .product-content p { flex:1; margin-bottom:var(--spacing-medium); }
+    .product-footer { display:flex; justify-content:space-between; align-items:center; }
+    .price { font-size:1.4rem; font-weight:700; color:var(--brand-primary); }
+    .product-btn { padding:10px 16px; border-radius:12px; }
+  `}</style>
+</section>
+
 
       {/* Downloadable Guides */}
       <section className="guides-section">
