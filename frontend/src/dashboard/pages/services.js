@@ -647,8 +647,8 @@ function ReservationsTable() {
           <tbody className="divide-y divide-gray-200">
             {reservations.map((r) => (
               <tr key={r.id}>
-                <td className="px-4 py-2 text-sm text-gray-700">{r.clientName}</td>
-                <td className="px-4 py-2 text-sm text-gray-700">{r.serviceTitle}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{r.clientname}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{r.servicetitle}</td>
                 <td className="px-4 py-2 text-sm text-gray-700">{r.phone}</td>
                 <td className="px-4 py-2 text-sm text-gray-700">{new Date(r.date).toLocaleString()}</td>
                 <td className="px-4 py-2 text-sm">

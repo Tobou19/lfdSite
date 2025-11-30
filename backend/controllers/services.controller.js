@@ -1,135 +1,214 @@
 const db = require("../config/db.config.js");
 
 // 🟢 Obtenir tous les services
-const getAll = (req, res) => {
-  db.query("SELECT * FROM services", (err, results) => {
-    if (err) {
-      console.error("❌ Erreur MySQL :", err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
+const getAll = async (req, res) => {
+  try {
+    const results = await db.queryAsync("SELECT * FROM services");
 
-    // Convertir le JSON "includes"
-    const services = results.map((s) => ({
-      ...s,
-      includes: s.includes ? JSON.parse(s.includes) : [],
-    }));
+    // Convertir le JSON "includes" de manière sécurisée
+    const services = results.map((s) => {
+      let includes = [];
+      
+      if (s.includes) {
+        try {
+          // Si c'est déjà un objet (JSONB PostgreSQL), le retourner tel quel
+          if (typeof s.includes === 'object') {
+            includes = Array.isArray(s.includes) ? s.includes : [];
+          } else {
+            // Sinon, parser la chaîne JSON
+            includes = JSON.parse(s.includes);
+          }
+        } catch (e) {
+          console.warn(`⚠️ Erreur parsing JSON pour service ${s.id}:`, s.includes);
+          includes = [];
+        }
+      }
+
+      return {
+        ...s,
+        includes,
+      };
+    });
 
     res.status(200).json(services);
-  });
+  } catch (err) {
+    console.error("❌ Erreur DB :", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
 // 🟢 Obtenir un service par ID
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const id = req.params.id;
 
-  db.query("SELECT * FROM services WHERE id = ?", [id], (err, results) => {
-    if (err) {
-      console.error("❌ Erreur MySQL :", err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
+  try {
+    const results = await db.queryAsync("SELECT * FROM services WHERE id = ?", [id]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: "Service introuvable" });
     }
 
     const service = results[0];
-    service.includes = service.includes ? JSON.parse(service.includes) : [];
+    
+    // Parser includes de manière sécurisée
+    let includes = [];
+    if (service.includes) {
+      try {
+        if (typeof service.includes === 'object') {
+          includes = Array.isArray(service.includes) ? service.includes : [];
+        } else {
+          includes = JSON.parse(service.includes);
+        }
+      } catch (e) {
+        console.warn(`⚠️ Erreur parsing JSON pour service ${service.id}`);
+        includes = [];
+      }
+    }
+    
+    service.includes = includes;
 
     res.status(200).json(service);
-  });
+  } catch (err) {
+    console.error("❌ Erreur DB :", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
 // 🟢 Créer un service
-const create = (req, res) => {
+const create = async (req, res) => {
   const { price, duration, title, desc, includes, active } = req.body;
 
   if (!title || !price) {
     return res.status(400).json({ error: "title et price sont requis" });
   }
 
-  const data = {
-    price,
-    duration,
-    title,
-    description: desc || "",
-    includes: JSON.stringify(includes || []),
-    active: active ?? 1,
-  };
+  try {
+    let insertId;
 
-  db.query("INSERT INTO services SET ?", data, (err, results) => {
-    if (err) {
-      console.error("❌ Erreur MySQL :", err);
-      return res.status(500).json({ error: "Erreur lors de la création" });
+    if (db.isPostgres) {
+      // PostgreSQL : INSERT ... RETURNING id
+      const result = await db.queryAsync(
+        `INSERT INTO services (price, duration, title, description, includes, active) 
+         VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
+        [
+          price,
+          duration || null,
+          title,
+          desc || "",
+          JSON.stringify(includes || []),
+          active ?? 1,
+        ]
+      );
+      insertId = result[0].id;
+    } else {
+      // MySQL : INSERT SET ?
+      const data = {
+        price,
+        duration,
+        title,
+        description: desc || "",
+        includes: JSON.stringify(includes || []),
+        active: active ?? 1,
+      };
+      const result = await db.queryAsync("INSERT INTO services SET ?", data);
+      insertId = result.insertId;
     }
 
     res.status(201).json({
       message: "✅ Service créé",
-      id: results.insertId,
-      ...data,
+      id: insertId,
+      price,
+      duration,
+      title,
+      description: desc || "",
       includes: includes || [],
+      active: active ?? 1,
     });
-  });
+  } catch (err) {
+    console.error("❌ Erreur DB :", err);
+    res.status(500).json({ error: "Erreur lors de la création" });
+  }
 };
 
 // 🟢 Mettre à jour un service
-const update = (req, res) => {
+const update = async (req, res) => {
   const id = req.params.id;
   const { price, duration, title, desc, includes, active } = req.body;
 
-  const updateData = {
-    price,
-    duration,
-    title,
-    description: desc,
-    active,
-  };
+  const updates = [];
+  const values = [];
 
-  if (includes) updateData.includes = JSON.stringify(includes);
+  if (price !== undefined) {
+    updates.push("price = ?");
+    values.push(price);
+  }
+  if (duration !== undefined) {
+    updates.push("duration = ?");
+    values.push(duration);
+  }
+  if (title !== undefined) {
+    updates.push("title = ?");
+    values.push(title);
+  }
+  if (desc !== undefined) {
+    updates.push("description = ?");
+    values.push(desc);
+  }
+  if (includes !== undefined) {
+    updates.push("includes = ?");
+    values.push(JSON.stringify(includes));
+  }
+  if (active !== undefined) {
+    updates.push("active = ?");
+    values.push(active);
+  }
 
-  // Nettoyer les undefined
-  Object.keys(updateData).forEach(
-    (key) => updateData[key] === undefined && delete updateData[key]
-  );
+  if (updates.length === 0) {
+    return res.status(400).json({ error: "Aucune donnée à mettre à jour" });
+  }
 
-  db.query(
-    "UPDATE services SET ? WHERE id = ?",
-    [updateData, id],
-    (err, results) => {
-      if (err) {
-        console.error("❌ Erreur MySQL :", err);
-        return res.status(500).json({ error: "Erreur serveur" });
-      }
+  values.push(id);
 
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Service introuvable" });
-      }
+  try {
+    const sql = `UPDATE services SET ${updates.join(", ")} WHERE id = ?`;
+    const result = await db.queryAsync(sql, values);
 
-      res.json({
-        message: "✅ Service mis à jour",
-        id,
-        ...updateData,
-        includes: includes || undefined,
-      });
+    // Vérifier si une ligne a été modifiée
+    const affectedRows = db.isPostgres ? result.length : result.affectedRows;
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: "Service introuvable" });
     }
-  );
+
+    res.json({
+      message: "✅ Service mis à jour",
+      id,
+    });
+  } catch (err) {
+    console.error("❌ Erreur DB :", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
 // 🟢 Supprimer un service
-const remove = (req, res) => {
+const remove = async (req, res) => {
   const id = req.params.id;
 
-  db.query("DELETE FROM services WHERE id = ?", [id], (err, results) => {
-    if (err) {
-      console.error("❌ Erreur MySQL :", err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
+  try {
+    const result = await db.queryAsync("DELETE FROM services WHERE id = ?", [id]);
 
-    if (results.affectedRows === 0) {
+    // Vérifier si une ligne a été supprimée
+    const affectedRows = db.isPostgres ? result.length : result.affectedRows;
+
+    if (affectedRows === 0) {
       return res.status(404).json({ error: "Service introuvable" });
     }
 
     res.json({ message: "🗑️ Service supprimé avec succès" });
-  });
+  } catch (err) {
+    console.error("❌ Erreur DB :", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
 module.exports = {

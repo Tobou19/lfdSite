@@ -1,13 +1,12 @@
 const dotenv = require("dotenv");
-// Charger les variables d'environnement
 dotenv.config();
 
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql2");
-const app = express();
-const db = require("./config/db.config.js");
 const jwt = require("jsonwebtoken");
+const db = require("./config/db.config.js"); // ⚠ Doit utiliser pg.pool / pg.client
+
+// Routes modules
 const beneficiaresRouter = require("./routes/beneficiares.routes.js");
 const carnetRouter = require("./routes/carnet.routes.js");
 const servicesRouter = require("./routes/services.routes.js");
@@ -17,121 +16,140 @@ const teamRouter = require("./routes/team.routes.js");
 const articlesRouter = require("./routes/articles.routes.js");
 const usersRouter = require("./routes/users.routes.js");
 
-
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-const auth = require("./middlewares/auth");
 
+// ➤ Root check
 app.get("/", (req, res) => {
-  res.send("Backend Express.js + MySQL prêt ✅");
-});
-
-app.get("/users", (req, res) => {
-  db.query("SELECT * FROM users", (err, results) => {
-    if (err) {
-      console.error("Erreur MySQL :", err);
-      res.status(500).json({ error: "Erreur serveur" });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
-app.get("/api/appointment", (req, res) => {
-  db.query("SELECT * FROM contact", (err, results) => {
-    if (err) {
-      console.error("Erreur MySQL :", err);
-      res.status(500).json({ error: "Erreur serveur" });
-    } else {
-      res.status(200).json(results);
-    }
-  });
+  const dbType = "PostgreSQL (Supabase)";
+  res.json({ message: "Backend Express + PostgreSQL OK 🟢", database: dbType });
 });
 
 
-app.post("/api/login", (req, res) => {
+// ========================================================
+// 🔥 USERS LIST (PG)
+// ========================================================
+app.get("/users", async (req, res) => {
+  try {
+    const result = await db.query(`SELECT * FROM users`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ PostgreSQL error:", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
+// ========================================================
+// 🔥 CONTACT APPOINTMENT (PG)
+// ========================================================
+app.get("/api/appointment", async (req, res) => {
+  try {
+    const result = await db.query(`SELECT * FROM contact`);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("❌ PostgreSQL error:", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+
+// ========================================================
+// 🔥 LOGIN (PGSQL VERSION)
+// ========================================================
+app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
-  db.query("SELECT * FROM users WHERE email = ?", [email], (err, results) => {
-    if (err) {
-      console.error("Erreur MySQL :", err);
-      return res.status(500).json({ error: "Erreur serveur" });
-    }
+  try {
+    // ❗ PostgreSQL = pas de ?
+    const result = await db.query(
+      `SELECT * FROM users WHERE email = $1`,
+      [email]
+    );
 
-    if (results.length === 0) {
+    if (result.rowCount === 0) {
       return res.status(401).json({ error: "Identifiants invalides" });
     }
 
-    const user = results[0];
+    const user = result.rows[0];
 
-    // ❗ Vérification SANS cryptage pour le moment
     if (user.password !== password) {
-      return res.status(401).json({ error: "Identifiants invalides" });
+      return res.status(401).json({ error: "Mot de passe incorrect" });
     }
 
-    // 🔥 Génération d’un token valide 7 jours
+    // 🔥 JWT
     const token = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.JWT_SECRET || "jkAZ9sJH8aSD7as8d7asd8A7D8A7d8ASD7as8d7A8SD7A8s7d8AS87D",
+      process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-
 
     res.json({
-      message: "Authentification réussie",
+      message: "Connexion validée 🔐",
       token,
-      user: { id: user.id, email: user.email },
+      user: {
+        id: user.id,
+        email: user.email,
+        firstname: user.firstname,
+        lastname: user.lastname,
+      }
     });
-  });
+
+  } catch (err) {
+    console.error("❌ Login PG error:", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 });
 
 
-app.post("/api/contact", (req, res) => {
+// ========================================================
+// 🔥 CONTACT FORM (PGSQL VERSION)
+// ========================================================
+app.post("/api/contact", async (req, res) => {
   const {
-    firstName,
-    lastName,
+    firstname,
+    lastname,
     email,
     phone,
     subject,
     message,
-    preferredDate,
-    preferredTime,
+    preferreddate,
+    preferredtime
   } = req.body;
 
-  db.query(
-    "INSERT INTO contact (firstName, lastName, email, phone, subject, message, preferredDate, preferredTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [
-      firstName,
-      lastName,
-      email,
-      phone,
-      subject,
-      message,
-      preferredDate,
-      preferredTime,
-    ],
-    (err, results) => {
-      if (err) {
-        console.error("❌ Erreur MySQL :", err);
-        res.status(500).json({ error: "Erreur serveur" });
-      } else {
-        res.json({ message: "✅ Votre demande a ete envoye" });
-      }
-    }
-  );
+  try {
+    await db.query(
+      `INSERT INTO contact (
+        firstname, lastname, email, phone, subject, message, preferreddate, preferredtime
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [firstname, lastname, email, phone, subject, message, preferreddate, preferredtime]
+    );
+
+    res.json({ message: "📨 Message enregistré avec succès" });
+  } catch (err) {
+    console.error("❌ Insert error:", err);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 });
 
-app.use("/beneficiaires",beneficiaresRouter);
-app.use("/carnet",carnetRouter);
-app.use("/services",servicesRouter);
-app.use("/reservations",reservationsRouter);
-app.use("/testimonials",testimonialsRouter);
-app.use("/team",teamRouter);
-app.use("/articles",articlesRouter);
-app.use("/users",usersRouter);
+
+// ========================================================
+// 🔗 AUTO MOUNT ROUTES (déjà PostgreSQL-ready)
+// ========================================================
+app.use("/beneficiaires", beneficiaresRouter);
+app.use("/carnet", carnetRouter);
+app.use("/services", servicesRouter);
+app.use("/reservations", reservationsRouter);
+app.use("/testimonials", testimonialsRouter);
+app.use("/team", teamRouter);
+app.use("/articles", articlesRouter);
+app.use("/users", usersRouter);
+
+
+// ========================================================
+// 🚀 SERVER START
+// ========================================================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server online → http://localhost:${PORT}`));
