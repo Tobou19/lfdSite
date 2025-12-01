@@ -115,7 +115,7 @@ const Resources = () => {
   ];
 
   useEffect(() => {
-    fetch("http://localhost:5000/articles")
+    fetch("https://lfdsite.onrender.com/articles")
       .then((res) => res.json())
       .then((data) => {
         setArticles(data);

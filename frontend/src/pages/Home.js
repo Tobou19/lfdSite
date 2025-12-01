@@ -18,7 +18,7 @@ const Home = () => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/services")
+    fetch("https://lfdsite.onrender.com/services")
       .then(res => res.json())
       .then(data => setServices(data))
       .catch(err => console.error("Erreur fetch services:", err));
@@ -26,7 +26,7 @@ const Home = () => {
 
   const [testimonials, setTestimonials] = useState([]);
 
-  const API_URL = "http://localhost:5000/testimonials"; // adapte à ton backend
+  const API_URL = "https://lfdsite.onrender.com/testimonials"; // adapte à ton backend
 
   useEffect(() => {
     const fetchTestimonials = async () => {

@@ -22,7 +22,7 @@ export default function ManageUsers() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const API_URL = "http://localhost:5000/users";
+  const API_URL = "https://lfdsite.onrender.com/users";
 
   // 🔄 Charger les utilisateurs
   const fetchUsers = async () => {

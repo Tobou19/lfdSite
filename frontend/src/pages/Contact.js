@@ -34,7 +34,7 @@ const Contact = () => {
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/contact", formData);
+      const res = await axios.post("https://lfdsite.onrender.com/api/contact", formData);
     
       setMessage(res.data.message || "Votre message a été envoyé ✅");
       setError(false);

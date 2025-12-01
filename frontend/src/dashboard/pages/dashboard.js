@@ -37,7 +37,7 @@ export default function ManageDashbord() {
 
   // Charger membres
   useEffect(() => {
-    fetch("http://localhost:5000/team")
+    fetch("https://lfdsite.onrender.com/team")
       .then((res) => res.json())
       .then((data) => setTeam(data))
       .catch((err) => console.error("Erreur récupération équipe :", err));
@@ -46,7 +46,7 @@ export default function ManageDashbord() {
   // Supprimer
   const removeMember = (id) => {
     if (window.confirm("Supprimer ce membre ?")) {
-      fetch(`http://localhost:5000/team/delete/${id}`, { method: "DELETE" })
+      fetch(`https://lfdsite.onrender.com/team/delete/${id}`, { method: "DELETE" })
         .then(() => setTeam(team.filter((m) => m.id !== id)))
         .catch((err) => console.error(err));
     }
@@ -78,7 +78,7 @@ export default function ManageDashbord() {
       certifications: newMember.certifications.split(",").map((c) => c.trim()),
     };
 
-    fetch("http://localhost:5000/team/create", {
+    fetch("https://lfdsite.onrender.com/team/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -110,7 +110,7 @@ export default function ManageDashbord() {
       certifications: editData.certifications.split(",").map((c) => c.trim()),
     };
 
-    fetch(`http://localhost:5000/team/update/${editData.id}`, {
+    fetch(`https://lfdsite.onrender.com/team/update/${editData.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

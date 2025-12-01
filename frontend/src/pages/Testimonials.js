@@ -5,7 +5,7 @@ import axios from "axios";
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
 
-  const API_URL = "http://localhost:5000/testimonials"; // adapte à ton backend
+  const API_URL = "https://lfdsite.onrender.com/testimonials"; // adapte à ton backend
 
   useEffect(() => {
     const fetchTestimonials = async () => {

@@ -18,7 +18,7 @@ export default function ManageBeneficiaries() {
   useEffect(() => {
     const fetchBeneficiaires = async () => {
       const beneficiaires = await axios.get(
-        "http://localhost:5000/beneficiaires"
+        "https://lfdsite.onrender.com/beneficiaires"
       );
       setBeneficiaries(beneficiaires.data);
     };
@@ -160,12 +160,12 @@ export default function ManageBeneficiaries() {
     }
 
     if (editing) {
-      await axios.put(`http://localhost:5000/beneficiaires/${editing}`, form);
+      await axios.put(`https://lfdsite.onrender.com/beneficiaires/${editing}`, form);
     } else {
-      await axios.post("http://localhost:5000/beneficiaires/add", form);
+      await axios.post("https://lfdsite.onrender.com/beneficiaires/add", form);
     }
 
-    const res = await axios.get("http://localhost:5000/beneficiaires");
+    const res = await axios.get("https://lfdsite.onrender.com/beneficiaires");
     setBeneficiaries(res.data);
     setShowAddModal(false);
     setEditing(null);
@@ -192,7 +192,7 @@ export default function ManageBeneficiaries() {
       return;
 
     try {
-      await axios.delete(`http://localhost:5000/beneficiaires/${id}`);
+      await axios.delete(`https://lfdsite.onrender.com/beneficiaires/${id}`);
 
       // seulement après confirmation côté serveur, mettre à jour le state
       setBeneficiaries((prev) => prev.filter((b) => b.id !== id));
@@ -248,7 +248,7 @@ export default function ManageBeneficiaries() {
       ...prev,
       [selected.id]: [...(prev[selected.id] || []), { id, ...payload }],
     }));
-    axios.post(`http://localhost:5000/beneficiaires/appointment/${6}`, payload);
+    axios.post(`https://lfdsite.onrender.com/beneficiaires/appointment/${6}`, payload);
   };
 
   function removeAppointment(id) {

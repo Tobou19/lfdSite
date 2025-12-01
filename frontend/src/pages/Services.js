@@ -50,7 +50,7 @@ const Services = () => {
     };
 
     axios
-      .post("http://localhost:5000/reservations/create", reservation)
+      .post("https://lfdsite.onrender.com/reservations/create", reservation)
       .then((res) => {
         alert("Réservation envoyée avec succès !");
         closeModal();
@@ -69,7 +69,7 @@ const Services = () => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:5000/services")
+    fetch("https://lfdsite.onrender.com/services")
       .then((res) => res.json())
       .then((data) => {
         setServices(data);

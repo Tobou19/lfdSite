@@ -203,7 +203,7 @@ function ServicesTab() {
 
   // -- 1. Charger services depuis backend --
   const loadServices = async () => {
-    const res = await fetch("http://localhost:5000/services");
+    const res = await fetch("https://lfdsite.onrender.com/services");
     const data = await res.json();
     setServices(data);
   };
@@ -611,7 +611,7 @@ function ReservationsTable() {
 
   // Charger les réservations depuis le backend
   useEffect(() => {
-    fetch("http://localhost:5000/reservations")
+    fetch("https://lfdsite.onrender.com/reservations")
       .then((res) => res.json())
       .then((data) => setReservations(data))
       .catch((err) => console.error("Erreur fetch reservations:", err));
@@ -695,7 +695,7 @@ function ArticlesTab() {
   // Charger articles depuis backend
   const loadArticles = async () => {
     try {
-      const res = await fetch("http://localhost:5000/articles");
+      const res = await fetch("https://lfdsite.onrender.com/articles");
       const data = await res.json();
       setArticles(data);
     } catch (err) {

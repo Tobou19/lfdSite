@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Users, Target, Heart, BookOpen } from "lucide-react";
 import { mockData } from "../data/mockData";
+import DomeGallery from "@/components/domeGallery/DomeGallery";
 
 const About = () => {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/team")
+    fetch("https://lfdsite.onrender.com/team")
       .then((res) => res.json())
       .then((data) => {
         setTeam(data);
@@ -185,6 +186,10 @@ const About = () => {
           )}
         </div>
       </section>
+
+      {/* <div style={{ width: '100vw', height: '100vh' }}>
+      <DomeGallery />
+    </div> */}
 
       <style jsx>{`
         .about-page {

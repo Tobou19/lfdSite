@@ -26,7 +26,7 @@ export default function ManageTestimonials() {
     verified: false,
   });
 
-  const API_URL = "http://localhost:5000/testimonials"; // adapte à ton backend
+  const API_URL = "https://lfdsite.onrender.com/testimonials"; // adapte à ton backend
 
   const fetchTestimonials = async () => {
     try {

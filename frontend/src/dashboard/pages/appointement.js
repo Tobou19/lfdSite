@@ -18,7 +18,7 @@ export default function AppointmentManager() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/appointment");
+        const res = await axios.get("https://lfdsite.onrender.com/api/appointment");
         setAppointments(res.data);
       } catch (err) {
         console.error("Erreur lors du fetch des RDVs :", err);

@@ -9,7 +9,7 @@ const Team = () => {
   // 🔵 Charger les membres depuis ton backend
   useEffect(() => {
     axios
-      .get("http://localhost:5000/team") // adapte l'URL si besoin
+      .get("https://lfdsite.onrender.com/team") // adapte l'URL si besoin
       .then((res) => {
         setTeam(res.data);
         setLoading(false);
