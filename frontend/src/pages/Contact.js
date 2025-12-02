@@ -6,14 +6,14 @@ import axios from "axios";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    firstname: '',
+    lastname: '',
     email: '',
     phone: '',
     subject: 'consultation',
     message: '',
-    preferredDate: '',
-    preferredTime: ''
+    preferreddate: '',
+    preferredtime: ''
   });
   
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -68,9 +68,9 @@ const Contact = () => {
       {/* Contact Form & Info */}
       
       {error == true ? (message && (
-        <div className="text-center mt-4 text-sm text-red-500">{message}</div>
+        <div className="text-center mt-4 text-sm text-red-500 p-6 px-12 border border-red-500 rounded-lg bg-red-50 w-1/2 mx-auto">{message}</div>
       )) : (message && (
-        <div className="text-center mt-4 text-sm text-green-500">{message}</div>
+        <div className="text-center mt-4 text-sm text-green-500 p-6 px-12 border border-green-500 rounded-lg bg-green-50 w-1/2 mx-auto">{message}</div>
       ))}
 
       {isLoading ? (
@@ -100,9 +100,9 @@ const Contact = () => {
                     <input
                       type="text"
                       id="firstName"
-                      name="firstName"
+                      name="firstname"
                       className="form-input"
-                      value={formData.firstName}
+                      value={formData.firstname}
                       onChange={handleInputChange}
                       required
                     />
@@ -112,9 +112,9 @@ const Contact = () => {
                     <input
                       type="text"
                       id="lastName"
-                      name="lastName"
+                      name="lastname"
                       className="form-input"
-                      value={formData.lastName}
+                      value={formData.lastname}
                       onChange={handleInputChange}
                       required
                     />
@@ -171,9 +171,9 @@ const Contact = () => {
                     <input
                       type="date"
                       id="preferredDate"
-                      name="preferredDate"
+                      name="preferreddate"
                       className="form-input"
-                      value={formData.preferredDate}
+                      value={formData.preferreddate}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -181,9 +181,9 @@ const Contact = () => {
                     <label htmlFor="preferredTime" className="form-label">Horaire préféré</label>
                     <select
                       id="preferredTime"
-                      name="preferredTime"
+                      name="preferredtime"
                       className="form-select"
-                      value={formData.preferredTime}
+                      value={formData.preferredtime}
                       onChange={handleInputChange}
                     >
                       <option value="">Sélectionner un créneau</option>

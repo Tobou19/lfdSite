@@ -242,14 +242,14 @@ const openForm = (service = null) =>
 
     if (form.id) {
       // update
-      await fetch(`http://localhost:5000/services/update/${form.id}`, {
+      await fetch(`https://lfdsite.onrender.com/services/update/${form.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
     } else {
       // create
-      await fetch("http://localhost:5000/services/create", {
+      await fetch("https://lfdsite.onrender.com/services/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -262,7 +262,7 @@ const openForm = (service = null) =>
 
   // -- 4. Toggle active --
   const toggleActive = async (id) => {
-    await fetch(`http://localhost:5000/services/toggle/${id}`, {
+    await fetch(`https://lfdsite.onrender.com/services/toggle/${id}`, {
       method: "PATCH",
     });
     loadServices();
@@ -270,7 +270,7 @@ const openForm = (service = null) =>
 
   // -- 5. Supprimer --
   const removeService = async (id) => {
-    await fetch(`http://localhost:5000/services/delete/${id}`, {
+    await fetch(`https://lfdsite.onrender.com/services/delete/${id}`, {
       method: "DELETE",
     });
     loadServices();

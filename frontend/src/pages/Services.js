@@ -30,8 +30,8 @@ const Services = () => {
     setIsModalOpen(false);
   };
 
-  const [clientName, setClientName] = useState("");
-  const [serviceTitle, setServiceTitle] = useState("");
+  const [clientname, setClientName] = useState("");
+  const [servicetitle, setServiceTitle] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("");
   const [email, setEmail] = useState("");
@@ -41,11 +41,11 @@ const Services = () => {
   const reservationSubmit = (e) => {
     e.preventDefault();
     const reservation = {
-      clientName,
+      clientname,
       email,
       phone,
       date,
-      serviceTitle: selectedService.title,
+      servicetitle : selectedService.title,
       type,
     };
 
@@ -282,7 +282,7 @@ const Services = () => {
                       Nom complet:
                       <input
                         type="text"
-                        value={clientName}
+                        value={clientname}
                         onChange={(e) => setClientName(e.target.value)}
                         required
                       />
