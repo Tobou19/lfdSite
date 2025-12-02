@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight, Heart, Users, Award, TrendingUp, Calendar, User } from "lucide-react";
+import {
+  ChevronRight,
+  Heart,
+  Users,
+  Award,
+  TrendingUp,
+  Calendar,
+  User,
+} from "lucide-react";
 import { mockData } from "../data/mockData";
 import axios from "axios";
 import SplitText from "@/components/split/split";
+import DomeGallery from "@/components/domeGallery/DomeGallery";
 
 const Home = () => {
   const [animatedStats, setAnimatedStats] = useState(false);
@@ -19,9 +28,9 @@ const Home = () => {
 
   useEffect(() => {
     fetch("https://lfdsite.onrender.com/services")
-      .then(res => res.json())
-      .then(data => setServices(data))
-      .catch(err => console.error("Erreur fetch services:", err));
+      .then((res) => res.json())
+      .then((data) => setServices(data))
+      .catch((err) => console.error("Erreur fetch services:", err));
   }, []);
 
   const [testimonials, setTestimonials] = useState([]);
@@ -48,7 +57,7 @@ const Home = () => {
   return (
     <div className="home-page">
       {/* Hero Section */}
-{/* 
+      {/* 
       <SplitText
   text="Hello, GSAP!"
   className="text-2xl font-semibold text-center"
@@ -64,49 +73,55 @@ const Home = () => {
   onLetterAnimationComplete={handleAnimationComplete}
 /> */}
       <section className="hero-section">
-  <div className="container">
-    <div className="hero-content">
-      <SplitText
-        text={mockData.hero.title} // ton titre principal
-        tag="h1"
-        className="display-large animated fadeIn"
-        delay={100}
-        duration={0.6}
-        ease="power3.out"
-        splitType="chars" // "chars" pour caractères, "words" pour mots
-        from={{ opacity: 0, y: 40 }}
-        to={{ opacity: 1, y: 0 }}
-        threshold={0.1}
-        rootMargin="-100px"
-        textAlign="center"
-        onLetterAnimationComplete={() => console.log("Animation titre terminée !")}
-      />
-      <p className="body-large animated fadeIn delay-200ms">
-        {mockData.hero.subtitle}
-      </p>
-      <p className="body-medium animated fadeIn delay-500ms">
-        {mockData.hero.description}
-      </p>
-      <div className="hero-actions animated fadeIn delay-500ms">
-        <Link to="/contact" className="btn-cta">
-          {mockData.hero.cta}
-          <ChevronRight size={20} />
-        </Link>
-        <Link to="/services" className="btn-secondary">
-          {mockData.hero.secondaryCta}
-        </Link>
-      </div>
-    </div>
-  </div>
-</section>
-
+        <div className="container">
+          <div className="hero-content">
+            <SplitText
+              text={mockData.hero.title} // ton titre principal
+              tag="h1"
+              className="display-large animated fadeIn"
+              delay={100}
+              duration={0.6}
+              ease="power3.out"
+              splitType="chars" // "chars" pour caractères, "words" pour mots
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+              onLetterAnimationComplete={() =>
+                console.log("Animation titre terminée !")
+              }
+            />
+            <p className="body-large animated fadeIn delay-200ms">
+              {mockData.hero.subtitle}
+            </p>
+            <p className="body-medium animated fadeIn delay-500ms">
+              {mockData.hero.description}
+            </p>
+            <div className="hero-actions animated fadeIn delay-500ms">
+              <Link to="/contact" className="btn-cta">
+                {mockData.hero.cta}
+                <ChevronRight size={20} />
+              </Link>
+              <Link to="/services" className="btn-secondary">
+                {mockData.hero.secondaryCta}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="stats-section">
         <div className="container">
           <div className="stats-grid">
             {mockData.stats.map((stat, index) => (
-              <div key={index} className={`stat-card ${animatedStats ? 'zoomIn ready' : 'zoomIn'}`}>
+              <div
+                key={index}
+                className={`stat-card ${
+                  animatedStats ? "zoomIn ready" : "zoomIn"
+                }`}
+              >
                 <div className="stat-number">{stat.number}</div>
                 <div className="stat-label body-medium">{stat.label}</div>
               </div>
@@ -121,18 +136,23 @@ const Home = () => {
           <div className="section-header">
             <h2 className="heading-1">Nos Services Thérapeutiques</h2>
             <p className="body-large">
-              Des approches naturelles et scientifiquement prouvées pour traiter vos maladies chroniques
+              Des approches naturelles et scientifiquement prouvées pour traiter
+              vos maladies chroniques
             </p>
           </div>
-          
+
           <div className="network-grid">
             {services.slice(0, 4).map((service) => (
               <div key={service.id} className="network-card service-card">
                 <div className="service-header">
                   <Heart size={32} className="service-icon" />
                   <div className="service-meta">
-                    <span className="service-duration body-small">{service.duration}</span>
-                    <span className="service-price heading-3">{service.price}</span>
+                    <span className="service-duration body-small">
+                      {service.duration}
+                    </span>
+                    <span className="service-price heading-3">
+                      {service.price}
+                    </span>
                   </div>
                 </div>
                 <h3 className="network-card-title">{service.title}</h3>
@@ -143,7 +163,7 @@ const Home = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="section-cta">
             <Link to="/services" className="btn-primary">
               Découvrir tous nos services
@@ -158,9 +178,7 @@ const Home = () => {
           <div className="about-content">
             <div className="about-text">
               <h2 className="heading-1">Notre Approche Révolutionnaire</h2>
-              <p className="body-large">
-                {mockData.about.mission}
-              </p>
+              <p className="body-large">{mockData.about.mission}</p>
               <div className="values-preview">
                 {mockData.about.values.slice(0, 2).map((value, index) => (
                   <div key={index} className="value-item">
@@ -192,7 +210,9 @@ const Home = () => {
                 <TrendingUp size={48} className="stat-icon" />
                 <div className="stat-content">
                   <div className="stat-big">85%</div>
-                  <div className="body-medium">Amélioration des biomarqueurs</div>
+                  <div className="body-medium">
+                    Amélioration des biomarqueurs
+                  </div>
                 </div>
               </div>
             </div>
@@ -202,137 +222,170 @@ const Home = () => {
 
       {/* Testimonials Preview */}
       <section className="testimonials-preview">
-  <div className="container">
-    <div className="section-header">
-      <h2 className="heading-1">Ce que disent nos bénéficiaires</h2>
-      <p className="body-large">Des résultats concrets qui changent des vies</p>
-    </div>
-
-    <div className="testimonials-grid">
-      {testimonials.length > 0 ? (
-        testimonials.slice(0, 4).map((t) => (
-          <div key={t.id} className="testimonial-card">
-            <div className="testimonial-header">
-              <div className="beneficiary-avatar">
-                <User size={28} />
-              </div>
-              <div className="beneficiary-info">
-                <h4 className="heading-3">{t.full_name}</h4>
-                <span className="body-small">{t.age} ans • {t.condition_name}</span>
-              </div>
-            </div>
-
-            <blockquote className="testimonial-quote">
-              "{t.testimonial_text}"
-            </blockquote>
-
-            <div className="testimonial-results">
-              <div className="result-item">
-                <TrendingUp size={20} />
-                <span>Résultat : <strong>{t.result_value}</strong></span>
-              </div>
-              <div className="result-item">
-                <Calendar size={16} />
-                <span>Suivi sur {t.follow_up_duration}</span>
-              </div>
-            </div>
-
-            {t.verified && <div className="testimonial-badge">Témoignage vérifié</div>}
+        <div className="container">
+          <div className="section-header">
+            <h2 className="heading-1">Ce que disent nos bénéficiaires</h2>
+            <p className="body-large">
+              Des résultats concrets qui changent des vies
+            </p>
           </div>
-        ))
-      ) : (
-        <p>Aucun témoignage disponible pour le moment.</p>
-      )}
-    </div>
 
-    <div className="section-cta">
-      <Link to="/témoignages" className="btn-primary">
-        Lire tous les témoignages
-      </Link>
-    </div>
-  </div>
+          <div className="testimonials-grid">
+            {testimonials.length > 0 ? (
+              testimonials.slice(0, 4).map((t) => (
+                <div key={t.id} className="testimonial-card">
+                  <div className="testimonial-header">
+                    <div className="beneficiary-avatar">
+                      <User size={28} />
+                    </div>
+                    <div className="beneficiary-info">
+                      <h4 className="heading-3">{t.full_name}</h4>
+                      <span className="body-small">
+                        {t.age} ans • {t.condition_name}
+                      </span>
+                    </div>
+                  </div>
 
-  <style jsx>{`
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: var(--spacing-large);
-    }
+                  <blockquote className="testimonial-quote">
+                    "{t.testimonial_text}"
+                  </blockquote>
 
-    .testimonial-card {
-      background: var(--bg-card);
-      border-left: 4px solid var(--brand-primary);
-      border-radius: 24px;
-      padding: var(--spacing-large);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
+                  <div className="testimonial-results">
+                    <div className="result-item">
+                      <TrendingUp size={20} />
+                      <span>
+                        Résultat : <strong>{t.result_value}</strong>
+                      </span>
+                    </div>
+                    <div className="result-item">
+                      <Calendar size={16} />
+                      <span>Suivi sur {t.follow_up_duration}</span>
+                    </div>
+                  </div>
 
-    .testimonial-card:hover {
-      transform: translateY(-4px);
-    }
+                  {t.verified && (
+                    <div className="testimonial-badge">Témoignage vérifié</div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p>Aucun témoignage disponible pour le moment.</p>
+            )}
+          </div>
 
-    .testimonial-header {
-      display: flex;
-      gap: var(--spacing-medium);
-      align-items: center;
-      margin-bottom: var(--spacing-medium);
-    }
+          <div className="section-cta">
+            <Link to="/témoignages" className="btn-primary">
+              Lire tous les témoignages
+            </Link>
+          </div>
+        </div>
 
-    .beneficiary-avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: var(--brand-primary);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+        <style jsx>{`
+          .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-large);
+          }
 
-    .testimonial-quote {
-      font-style: italic;
-      color: var(--text-primary);
-      margin-bottom: var(--spacing-medium);
-      line-height: 1.6;
-    }
+          .testimonial-card {
+            background: var(--bg-card);
+            border-left: 4px solid var(--brand-primary);
+            border-radius: 24px;
+            padding: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+          }
 
-    .testimonial-results {
-      display: flex;
-      gap: var(--spacing-large);
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: var(--spacing-medium);
-    }
+          .testimonial-card:hover {
+            transform: translateY(-4px);
+          }
 
-    .result-item {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-xs);
-    }
+          .testimonial-header {
+            display: flex;
+            gap: var(--spacing-medium);
+            align-items: center;
+            margin-bottom: var(--spacing-medium);
+          }
 
-    .testimonial-badge {
-      background: var(--brand-primary);
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      width: fit-content;
-    }
+          .beneficiary-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--brand-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
 
-    @media (max-width: 781px) {
-      .testimonials-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  `}</style>
-</section>
+          .testimonial-quote {
+            font-style: italic;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-medium);
+            line-height: 1.6;
+          }
 
+          .testimonial-results {
+            display: flex;
+            gap: var(--spacing-large);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-medium);
+          }
+
+          .result-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+          }
+
+          .testimonial-badge {
+            background: var(--brand-primary);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            width: fit-content;
+          }
+
+          @media (max-width: 781px) {
+            .testimonials-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+        `}</style>
+      </section>
+
+      {/* Dome Gallery Section */}
+      <section className="dome-gallery-section">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="heading-1">Souvenez-vous avec nous</h2>
+            <p className="body-large">Visitez notre mémoire pour en apprendre plus sur notre approche</p>
+            <ol type="1">
+            <span className="body-medium underline text-blue-200"><li>Tournez le globe pour découvrir notre approche</li></span>
+            <span className="body-medium underline text-blue-200"><li>Cliquez sur une image pour la voir en grand</li></span>
+            </ol>
+          </div>
+          <div className="dome-gallery-wrapper">
+            <DomeGallery
+              images={[
+                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800",
+                "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800",
+                "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800",
+                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
+                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
+              ]}
+              grayscale={false}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="cta-section">
@@ -340,7 +393,8 @@ const Home = () => {
           <div className="cta-content">
             <h2 className="heading-1">Prêt à transformer votre santé ?</h2>
             <p className="body-large">
-              Rejoignez les centaines de bénéficiaires qui ont retrouvé leur vitalité grâce à notre approche naturelle.
+              Rejoignez les centaines de bénéficiaires qui ont retrouvé leur
+              vitalité grâce à notre approche naturelle.
             </p>
             <div className="cta-actions">
               <Link to="/contact" className="btn-cta">
@@ -425,7 +479,9 @@ const Home = () => {
           color: var(--text-secondary);
         }
 
-        .services-preview, .about-preview, .testimonials-preview {
+        .services-preview,
+        .about-preview,
+        .testimonials-preview {
           padding: var(--spacing-giant) 0;
         }
 
@@ -636,20 +692,45 @@ const Home = () => {
           .home-page {
             padding-top: 80px;
           }
-          
+
           .about-content {
             grid-template-columns: 1fr;
             gap: var(--spacing-large);
           }
-          
+
           .testimonials-grid {
             grid-template-columns: 1fr;
           }
-          
+
           .hero-actions,
           .cta-actions {
             flex-direction: column;
             align-items: center;
+          }
+        }
+
+        .dome-gallery-section {
+          padding: var(--spacing-giant) 0;
+          background: var(--bg-page);
+          min-height: 100vh;
+        }
+
+        .dome-gallery-wrapper {
+          width: 100%;
+          height: 80vh;
+          min-height: 600px;
+          max-height: 900px;
+          margin: 0 auto;
+          border-radius: 24px;
+          overflow: hidden;
+          background:rgb(254, 253, 255);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 781px) {
+          .dome-gallery-wrapper {
+            height: 70vh;
+            min-height: 500px;
           }
         }
       `}</style>
