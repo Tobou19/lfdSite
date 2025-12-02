@@ -10,6 +10,7 @@ import {
   ArrowLeftOnRectangleIcon,
   ClipboardDocumentCheckIcon
 } from "@heroicons/react/24/solid";
+import ProductForm from "../components/productsForm";
 
 export default function ServicesPage() {
   const [tab, setTab] = useState("services");
@@ -130,6 +131,8 @@ function ProduitsTab() {
         <Plus className="w-4 h-4" /> Ajouter un produit
       </button>
     </div>
+
+    <ProductForm/>
 
     <div className="overflow-x-auto bg-white rounded-md shadow">
         <table className="min-w-full divide-y divide-gray-200">

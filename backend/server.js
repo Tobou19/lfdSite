@@ -15,6 +15,7 @@ const testimonialsRouter = require("./routes/testimonials.routes.js");
 const teamRouter = require("./routes/team.routes.js");
 const articlesRouter = require("./routes/articles.routes.js");
 const usersRouter = require("./routes/users.routes.js");
+const productsRouter = require("./routes/products.routes.js");
 
 const app = express();
 app.use(cors());
@@ -146,6 +147,7 @@ app.use("/testimonials", testimonialsRouter);
 app.use("/team", teamRouter);
 app.use("/articles", articlesRouter);
 app.use("/users", usersRouter);
+app.use("/products", productsRouter);
 
 
 // ========================================================
