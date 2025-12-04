@@ -18,6 +18,7 @@ const Resources = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
 
   const categories = [
     { value: "all", label: "Tous les articles" },
@@ -27,62 +28,62 @@ const Resources = () => {
     { value: "Maladies chroniques", label: "Maladies chroniques" },
   ];
 
-  const products = [
-    {
-      id: 1,
-      name: "Superfood Mix Détox",
-      description:
-        "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
-      price: 8500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
-    },
-    {
-      id: 2,
-      name: "Thé Minceur Métabolique",
-      description:
-        "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
-      price: 6500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
-    },
-    {
-      id: 3,
-      name: "Huile de Nigelle Premium",
-      description:
-        "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
-      price: 9500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
-    },
-    {
-      id: 4,
-      name: "Superfood Mix Détox",
-      description:
-        "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
-      price: 8500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
-    },
-    {
-      id: 5,
-      name: "Thé Minceur Métabolique",
-      description:
-        "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
-      price: 6500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
-    },
-    {
-      id: 6,
-      name: "Huile de Nigelle Premium",
-      description:
-        "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
-      price: 9500,
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
-    },
-  ];
+  // const products = [
+  //   {
+  //     id: 1,
+  //     name: "Superfood Mix Détox",
+  //     description:
+  //       "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+  //     price: 8500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Thé Minceur Métabolique",
+  //     description:
+  //       "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+  //     price: 6500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Huile de Nigelle Premium",
+  //     description:
+  //       "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+  //     price: 9500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Superfood Mix Détox",
+  //     description:
+  //       "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
+  //     price: 8500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Thé Minceur Métabolique",
+  //     description:
+  //       "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
+  //     price: 6500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Huile de Nigelle Premium",
+  //     description:
+  //       "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
+  //     price: 9500,
+  //     image:
+  //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
+  //   },
+  // ];
 
   const guides = [
     {
@@ -113,6 +114,13 @@ const Resources = () => {
       type: "PDF",
     },
   ];
+
+  useEffect(() => {
+    fetch("https://lfdsite.onrender.com/products")
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .catch(err => console.error(err));
+  }, []);
 
   useEffect(() => {
     fetch("https://lfdsite.onrender.com/articles")
@@ -307,7 +315,7 @@ const Resources = () => {
             {products.map((product) => (
               <div key={product.id} className="product-card">
                 <div className="product-image">
-                  <img src={product.image} alt={product.name} />
+                  <img src={product.image_url} alt={product.name} />
                 </div>
 
                 <div className="product-content">

@@ -366,20 +366,45 @@ const Home = () => {
         <div className="container">
           <div className="section-header">
             <h2 className="heading-1">Souvenez-vous avec nous</h2>
-            <p className="body-large">Visitez notre mémoire pour en apprendre plus sur notre approche</p>
+            <p className="body-large">
+              Visitez notre mémoire pour en apprendre plus sur notre approche
+            </p>
             <ol type="1">
-            <span className="body-medium underline text-blue-200"><li>Tournez le globe pour découvrir notre approche</li></span>
-            <span className="body-medium underline text-blue-200"><li>Cliquez sur une image pour la voir en grand</li></span>
+              <span className="body-medium underline text-blue-200">
+                <li>Tournez le globe pour découvrir notre approche</li>
+              </span>
+              <span className="body-medium underline text-blue-200">
+                <li>Cliquez sur une image pour la voir en grand</li>
+              </span>
             </ol>
           </div>
           <div className="dome-gallery-wrapper">
             <DomeGallery
               images={[
-                "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800",
-                "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800",
-                "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800",
-                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
-                "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/IMG-20250327-WA0001.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/Photo%20LFD-Services.png",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/JN202410_29826_main-thumb-1000x668-81371.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/1.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/10.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/11.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/12.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/13.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/14.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/15.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/16.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/17.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/18.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/19.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/2.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/20.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/21.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/22.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/23.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/24.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/25.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/26.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/27.jpg",
+                "https://sfxfgaxpsocgrirfrmtw.supabase.co/storage/v1/object/public/products-images/website/28.jpg",
               ]}
               grayscale={false}
             />
@@ -723,7 +748,7 @@ const Home = () => {
           margin: 0 auto;
           border-radius: 24px;
           overflow: hidden;
-          background:rgb(254, 253, 255);
+          background: rgb(254, 253, 255);
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 

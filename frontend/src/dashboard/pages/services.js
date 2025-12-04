@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus, Video, Eye, EyeOff, FileText, X } from "lucide-react";
-
+import axios from "axios";
 import {
   RectangleStackIcon,
   UserIcon,
@@ -57,58 +57,10 @@ export default function ServicesPage() {
 /* -----------------------------
         PRODUITS
 ------------------------------ */
+
 function ProduitsTab() {
   const [form, setForm] = useState(null);
-  const products = [
-    {
-      id: 1,
-      name: "Superfood Mix Détox",
-      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
-      price: 8500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
-      status: "confirmed"
-    },
-    {
-      id: 2,
-      name: "Thé Minceur Métabolique",
-      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
-      price: 6500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
-      status: "confirmed"
-    },
-    {
-      id: 3,
-      name: "Huile de Nigelle Premium",
-      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
-      price: 9500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
-      status: "confirmed"
-    },
-    {
-      id: 4,
-      name: "Superfood Mix Détox",
-      description: "Mélange 100% naturel – spiruline, moringa, gingembre et curcuma.",
-      price: 8500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8NsS0nlgjgOUMCHXF1VuerX09oE9fKvCCXg&s",
-      status: "confirmed"
-    },
-    {
-      id: 5,
-      name: "Thé Minceur Métabolique",
-      description: "Accélère la combustion, régule l'appétit & réduit la rétention d’eau.",
-      price: 6500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkOlyZyrSDD8ZzWSkXcF3q3OLMaYYGc8SYw&s",
-      status: "confirmed"
-    },
-    {
-      id: 6,
-      name: "Huile de Nigelle Premium",
-      description: "Anti-inflammatoire puissant – excellente pour le diabète & l’immunité.",
-      price: 9500,
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSju8v1p1_krQqji7uh3IWrTQdFjC7FxgZUgA&s",
-      status: "confirmed"
-    }
-  ];
+  const [products, setProducts] = useState([]);
 
   const openForm = () => {
     setForm({
@@ -117,84 +69,134 @@ function ProduitsTab() {
       duration: "",
       desc: "",
       includes: [""],
-      type: "Standard", 
-    })
-  }
-  return <div>
-    {/* Header */}
-    <div className="flex justify-between items-center mb-3">
-      <h2 className="text-lg font-bold text-gray-700">Tous les produits</h2>
-      <button
-        className="flex items-center gap-1 bg-violet-600 text-white px-3 py-1 rounded-md"
-        onClick={() => openForm()}
-      >
-        <Plus className="w-4 h-4" /> Ajouter un produit
-      </button>
-    </div>
+      type: "Standard",
+    });
+  };
 
-    <ProductForm/>
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get("https://lfdsite.onrender.com/products");
+        setProducts(res.data);
+      } catch (err) {
+        console.error("Erreur lors du chargement des produits :", err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
-    <div className="overflow-x-auto bg-white rounded-md shadow">
+  const removeProduct = async (id) => {
+    await axios.delete(`https://lfdsite.onrender.com/products/${id}`);
+    loadProducts();
+  };
+
+  const loadProducts = async () => {
+    const res = await axios.get("https://lfdsite.onrender.com/products");
+    setProducts(res.data);
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-lg font-bold text-gray-700">Tous les produits</h2>
+        <button
+          className="flex items-center gap-1 bg-violet-600 text-white px-3 py-1 rounded-md"
+          onClick={openForm}
+        >
+          <Plus className="w-4 h-4" /> Ajouter un produit
+        </button>
+      </div>
+
+      {form && (
+  <ProductForm
+  form={form}
+  setForm={setForm}
+  onClose={() => setForm(null)}
+  onSave={() => {
+    setForm(null);
+    loadProducts();
+  }}
+/>
+
+)}
+
+
+      <div className="overflow-x-auto bg-white rounded-md shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <UserIcon className="size-6"/>Nom
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <ClipboardDocumentCheckIcon className="size-6"/>Service
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Prix
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Statut
-              </th>
-              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mis à jour</th>
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {products.map((p) => (
               <tr key={p.id}>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.id}</td>
                 <td className="px-4 py-2 text-sm text-gray-700">{p.name}</td>
-                <td className="px-4 py-2 text-sm text-gray-700">{p.service}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.category}</td>
                 <td className="px-4 py-2 text-sm text-gray-700">{p.price}</td>
                 <td className="px-4 py-2 text-sm text-gray-700">{p.description}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{p.stock}</td>
                 <td className="px-4 py-2 text-sm">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       p.status === "confirmed"
                         ? "bg-green-100 text-green-700"
                         : p.status === "pending"
                         ? "bg-yellow-100 text-yellow-700"
                         : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                    }`}>
+                    {p.status}
                   </span>
                 </td>
-                <td className="px-4 py-2 text-sm text-right flex justify-end gap-2">
-                  <button className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">
-                    Voir
-                  </button>
-                  <button className="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">
-                    Supprimer
-                  </button>
-                </td>
+                <td className="px-4 py-2 text-sm text-gray-700">{new Date(p.created_at).toLocaleString()}</td>
+                <td className="px-4 py-2 text-sm text-gray-700">{new Date(p.updated_at).toLocaleString()}</td>
+                <td className="px-4 py-2 text-sm flex gap-2">
+  {/* Modifier le produit */}
+  <button
+    className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 hover:bg-blue-200"
+    onClick={() => setForm(p)} // ouvre le formulaire avec le produit actuel
+  >
+    Modifier
+  </button>
+
+  {/* Activer / Désactiver */}
+  <button
+    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      p.active ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    }`}
+    onClick={() => toggleActive(p.id)}
+  >
+    {p.active ? "Actif" : "Inactif"}
+  </button>
+
+  {/* Supprimer */}
+  <button
+    className="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200"
+    onClick={() => removeProduct(p.id)}
+  >
+    Supprimer
+  </button>
+</td>
+
               </tr>
             ))}
           </tbody>
         </table>
         {products.length === 0 && (
-          <p className="text-center text-gray-400 p-4">Aucun produit trouvée</p>
+          <p className="text-center text-gray-400 p-4">Aucun produit trouvé</p>
         )}
       </div>
-  </div>;
+    </div>
+  );
 }
 
 /* -----------------------------

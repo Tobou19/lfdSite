@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, DollarSign, Package } from 'lucide-react';
 import axios from 'axios';
 
-const ProductForm = () => {
+const ProductForm = ({ form, setForm, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     category: '',
-    stock: 0
+    stock: 0,
   });
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Pré-remplir le formulaire si en mode édition
+  useEffect(() => {
+    if (form) {
+      setFormData({
+        name: form.name || '',
+        description: form.description || '',
+        price: form.price || '',
+        category: form.category || '',
+        stock: form.stock || 0,
+      });
+      if (form.image) setPreview(form.image);
+    }
+  }, [form]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,40 +43,49 @@ const ProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const data = new FormData();
-      data.append('name', formData.name);
-      data.append('description', formData.description);
-      data.append('price', formData.price);
-      data.append('category', formData.category);
-      data.append('stock', formData.stock);
+      Object.entries(formData).forEach(([key, value]) => data.append(key, value));
       if (image) data.append('image', image);
-
-      const res = await axios.post('https://lfdsite.onrender.com/products', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      alert('✅ Produit créé avec succès !');
-      console.log(res.data);
-      
-      // Reset form
+  
+      let res;
+      if (form?.id) {
+        // édition
+        res = await axios.put(`https://lfdsite.onrender.com/products/${form.id}`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        // création
+        res = await axios.post('https://lfdsite.onrender.com/products', data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+  
+      alert('✅ Produit enregistré avec succès !');
+      if (onSave) onSave(res.data);
+  
+      // reset form
       setFormData({ name: '', description: '', price: '', category: '', stock: 0 });
       setImage(null);
       setPreview(null);
     } catch (err) {
       console.error(err);
-      alert('❌ Erreur lors de la création du produit');
+      alert('❌ Erreur lors de l’enregistrement');
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-6">Ajouter un Produit</h2>
-      
+      <h2 className="text-2xl font-bold mb-6">
+        {form?.id ? 'Modifier le Produit' : 'Ajouter un Produit'}
+      </h2>
+
       <form onSubmit={handleSubmit} className="space-y-6">
+
         {/* Image Upload */}
         <div>
           <label className="block text-sm font-medium mb-2">Image du produit</label>
@@ -165,14 +188,24 @@ const ProductForm = () => {
           />
         </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Enregistrement...' : 'Créer le Produit'}
-        </button>
+        {/* Submit Buttons */}
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Enregistrement...' : form?.id ? 'Sauvegarder' : 'Créer le Produit'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300"
+          >
+            Annuler
+          </button>
+        </div>
+
       </form>
     </div>
   );

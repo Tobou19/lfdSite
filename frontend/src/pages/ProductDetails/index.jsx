@@ -20,7 +20,7 @@ export default function ProductDetails({ products }) {
 
       {/* Produit */}
       <div className="product-wrapper">
-        <img src={product.image} alt={product.name} className="product-img"/>
+        <img src={product.image_url} alt={product.name} className="product-img"/>
 
         <div className="product-info">
           <h1>{product.name}</h1>
