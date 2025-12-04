@@ -330,6 +330,7 @@ const Header = () => {
                   e.preventDefault();
                   setActiveItem(item.path);
                   setIsMenuOpen(false);
+                  navigate(item.path);
                   console.log('Navigation vers:', item.path);
                 }}
                 style={{
