@@ -10,38 +10,74 @@ const Footer = () => {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* Bordure supérieure avec fruits animés */}
+      {/* Bordure supérieure avec deux lignes de fruits animés */}
       <div style={{
         background: 'linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fecaca 100%)',
-        padding: '0.75rem 0',
+        padding: '1rem 0',
         borderBottom: '3px solid #f97316',
         overflow: 'hidden'
       }}>
+        {/* Première ligne - défilement vers la gauche */}
         <div style={{
           display: 'flex',
-          gap: '2rem',
-          animation: 'scrollFruits 20s linear infinite',
-          whiteSpace: 'nowrap'
+          gap: '1.5rem',
+          animation: 'scrollLeft 25s linear infinite',
+          marginBottom: '0.75rem'
         }}>
-          {[...Array(12)].map((_, i) => {
+          {[...Array(40)].map((_, i) => {
             const fruits = [
               { Icon: Apple, color: '#ef4444' },
               { Icon: Cherry, color: '#f97316' },
               { Icon: Leaf, color: '#fbbf24' },
               { Icon: Grape, color: '#a855f7' },
               { Icon: Cherry, color: '#ec4899' },
-              { Icon: Leaf, color: '#22c55e' }
+              { Icon: Leaf, color: '#22c55e' },
+              { Icon: Apple, color: '#dc2626' },
+              { Icon: Grape, color: '#9333ea' }
             ];
             const fruit = fruits[i % fruits.length];
             return (
               <fruit.Icon 
                 key={i}
-                size={32}
+                size={28}
                 style={{
                   color: fruit.color,
                   flexShrink: 0,
                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                  animation: `bounce 2s ease-in-out infinite ${(i % 3) * 0.3}s`
+                  animation: `bounce 2s ease-in-out infinite ${(i % 4) * 0.25}s`
+                }}
+              />
+            );
+          })}
+        </div>
+
+        {/* Deuxième ligne - défilement vers la droite */}
+        <div style={{
+          display: 'flex',
+          gap: '1.5rem',
+          animation: 'scrollRight 30s linear infinite'
+        }}>
+          {[...Array(40)].map((_, i) => {
+            const fruits = [
+              { Icon: Grape, color: '#8b5cf6' },
+              { Icon: Leaf, color: '#10b981' },
+              { Icon: Cherry, color: '#f59e0b' },
+              { Icon: Apple, color: '#f87171' },
+              { Icon: Leaf, color: '#34d399' },
+              { Icon: Cherry, color: '#fb923c' },
+              { Icon: Grape, color: '#c084fc' },
+              { Icon: Apple, color: '#fca5a5' }
+            ];
+            const fruit = fruits[i % fruits.length];
+            return (
+              <fruit.Icon 
+                key={i}
+                size={28}
+                style={{
+                  color: fruit.color,
+                  flexShrink: 0,
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                  animation: `bounce 2s ease-in-out infinite ${(i % 4) * 0.25}s`
                 }}
               />
             );
@@ -271,12 +307,21 @@ const Footer = () => {
       </div>
 
       <style>{`
-        @keyframes scrollFruits {
+        @keyframes scrollLeft {
           0% {
             transform: translateX(0);
           }
           100% {
             transform: translateX(-50%);
+          }
+        }
+
+        @keyframes scrollRight {
+          0% {
+            transform: translateX(-50%);
+          }
+          100% {
+            transform: translateX(0);
           }
         }
 
