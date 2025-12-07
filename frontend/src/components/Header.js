@@ -43,7 +43,7 @@ const Header = () => {
       zIndex: 9999,
       padding: isScrolled ? '8px 16px' : '24px 16px',
       transition: 'all 0.3s ease',
-      background: isScrolled ? 'rgba(0, 69, 52, 0.95)' : 'transparent',
+      background: isScrolled ? 'rgb(58, 0, 69)' : 'transparent',
       backdropFilter: isScrolled ? 'blur(10px)' : 'none'
     }}>
       {/* Ligne de fruits décorative en haut */}
@@ -61,7 +61,7 @@ const Header = () => {
       <div style={{
         maxWidth: '1440px',
         margin: '0 auto',
-        background: 'linear-gradient(135deg, #004534 0%, #006644 100%)',
+        background: 'linear-gradient(135deg,rgb(58, 0, 69) 0%,rgb(99, 0, 102) 100%)',
         borderRadius: isScrolled ? '16px' : '25px',
         padding: '12px 20px',
         display: 'flex',
@@ -105,7 +105,7 @@ const Header = () => {
           <div style={{
             width: '40px',
             height: '40px',
-            background: 'white',
+            background: 'transparent',
             borderRadius: '12px',
             display: 'flex',
             alignItems: 'center',
@@ -126,7 +126,7 @@ const Header = () => {
           </div>
 
           {/* Fruits décoratifs */}
-          <div style={{
+          {/* <div style={{
             position: 'absolute',
             top: '-4px',
             right: '-4px',
@@ -142,7 +142,7 @@ const Header = () => {
               color: '#22c55e',
               animation: 'float 3s ease-in-out infinite 0.5s'
             }} />
-          </div>
+          </div> */}
 
           <div style={{
             display: 'flex',
@@ -160,6 +160,7 @@ const Header = () => {
               color: 'white',
               fontWeight: '700',
               fontSize: '20px',
+              fontFamily: 'Feel',
               textShadow: '0 2px 8px rgba(255,255,255,0.3)'
             }}>
               L
@@ -247,7 +248,7 @@ const Header = () => {
         </nav>
 
         {/* CTA Button Desktop */}
-        <button
+        {/* <button
           onClick={() => {
             setActiveItem('/contact');
             console.log('Navigation vers: /contact');
@@ -287,7 +288,7 @@ const Header = () => {
             background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
             animation: 'shine 2s infinite'
           }} />
-        </button>
+        </button> */}
 
         {/* Mobile Menu Button */}
         <button
